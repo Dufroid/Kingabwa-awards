@@ -36,7 +36,7 @@ export const Footer: React.FC = () => {
               <li><Link to="/about" className="hover:text-gold-300 transition-colors">À propos du projet</Link></li>
               <li><Link to="/categories" className="hover:text-gold-300 transition-colors">Catégories d'Awards</Link></li>
               <li><Link to="/nominees" className="hover:text-gold-300 transition-colors">Candidats & Nominés</Link></li>
-              <li><Link to="/hall-of-fame" className="hover:text-gold-300 transition-colors">Hall of Fame (Anciens lauréats)</Link></li>
+              <li><Link to="/hall-of-fame" className="hover:text-gold-300 transition-colors">Anciens lauréats</Link></li>
               <li><Link to="/gallery" className="hover:text-gold-300 transition-colors">Galerie Médias</Link></li>
               <li><Link to="/blog" className="hover:text-gold-300 transition-colors">Actualités & Presse</Link></li>
             </ul>
@@ -50,11 +50,11 @@ export const Footer: React.FC = () => {
             <ul className="space-y-3 text-xs text-slate-400">
               <li className="flex items-start gap-3">
                 <MapPin className="w-4 h-4 text-gold-400 shrink-0 mt-0.5" />
-                <span>Kingabwa Grand-Monde, Avenue des Brasseries, Kinshasa, RDC</span>
+                <span>Kingabwa Limete, Avenue Limba 7, Kinshasa, RDC</span>
               </li>
               <li className="flex items-center gap-3">
                 <Phone className="w-4 h-4 text-gold-400 shrink-0" />
-                <span>+243 810 000 000 / +243 990 000 000</span>
+                <span>+243 825959006 / +243 898849759 / +243 823536240</span>
               </li>
               <li className="flex items-center gap-3">
                 <Mail className="w-4 h-4 text-gold-400 shrink-0" />

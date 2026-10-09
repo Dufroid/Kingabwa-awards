@@ -20,7 +20,7 @@ export const Navbar: React.FC = () => {
     { name: 'Catégories', path: '/categories' },
     { name: 'Nominés', path: '/nominees' },
     { name: 'Blog', path: '/blog' },
-    { name: 'Hall of Fame', path: '/hall-of-fame' },
+    { name: 'Ancien Laureats', path: '/hall-of-fame' },
     { name: 'Galerie', path: '/gallery' },
     { name: 'Partenaires', path: '/partners' },
   ];

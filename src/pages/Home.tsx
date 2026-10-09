@@ -83,9 +83,9 @@ export const Home: React.FC = () => {
             transition={{ duration: 0.6 }}
             className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-gold-400/40 bg-gold-400/10 text-gold-300 shadow-gold-glow"
           >
-            <Sparkles className="w-4 h-4" />
+            
             <span className="text-xs font-bold uppercase tracking-widest">
-              KINGABWA AWARDS 2026 • 4ème Édition
+             KINGABWA AWARDS 2026 • 2ème Édition
             </span>
           </motion.div>
 
@@ -185,7 +185,7 @@ export const Home: React.FC = () => {
               <div className="absolute inset-0 bg-gradient-to-t from-dark-950 via-transparent to-transparent" />
               <div className="absolute bottom-4 left-4 right-4 bg-dark-950/80 backdrop-blur-md p-4 rounded-xl border border-gold-400/30">
                 <p className="text-xs font-bold text-gold-gradient">Grande Cérémonie Annuelle</p>
-                <p className="text-[11px] text-slate-300">Fleuve Congo Hotel - Kinshasa</p>
+                <p className="text-[11px] text-slate-300">Aqua Splash 14 rue Limete poids lourds- Kinshasa</p>
               </div>
             </div>
           </div>
@@ -193,11 +193,37 @@ export const Home: React.FC = () => {
       </section>
 
       {/* STATISTIQUES */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
           {[
             { icon: Award, count: categories.length || 6, label: 'Catégories d\'Awards' },
             { icon: Users, count: nominees.length ? nominees.length * 3 : 15, label: 'Nominés d\'Élite' },
+            { icon: Vote, count: '1,420+', label: 'Votants Enregistrés' },
+            { icon: Trophy, count: '12', label: 'Lauréats Récompensés' },
+          ].map((stat, idx) => {
+            const Icon = stat.icon;
+            return (
+              <div key={idx} className="glass-card rounded-2xl p-6 text-center border border-gold-400/20 space-y-2">
+                <div className="w-10 h-10 rounded-full bg-gold-gradient/20 mx-auto flex items-center justify-center text-gold-400 mb-2">
+                  <Icon className="w-5 h-5" />
+                </div>
+                <div className="font-serif text-3xl sm:text-4xl font-extrabold text-gold-gradient">
+                  {stat.count}
+                </div>
+                <p className="text-xs uppercase tracking-wider text-slate-400 font-semibold">
+                  {stat.label}
+                </p>
+              </div>
+            );
+          })}
+        </div>
+      </section> */}
+
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+          {[
+            { icon: Award, count: 14, label: 'Catégories d\'Awards' },
+            { icon: Users, count:14, label: 'Nominés d\'Élite' },
             { icon: Vote, count: '1,420+', label: 'Votants Enregistrés' },
             { icon: Trophy, count: '12', label: 'Lauréats Récompensés' },
           ].map((stat, idx) => {
