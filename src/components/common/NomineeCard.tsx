@@ -44,12 +44,16 @@ export const NomineeCard: React.FC<NomineeCardProps> = ({ nominee, onVoteClick, 
 
       {/* Body content */}
       <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
-        <p className="text-slate-300 text-xs leading-relaxed line-clamp-3">
+        {!nominee.shortBio &&(
+ <p className="text-slate-300 text-xs leading-relaxed line-clamp-3">
           {nominee.shortBio}
         </p>
+        )} 
+       
 
         {/* Action Buttons */}
         <div className="flex items-center gap-2 pt-2 border-t border-slate-800">
+          {nominee.slug && (
           <Link
             to={`/nominees/${nominee.slug}`}
             className="flex-1 py-2.5 px-3 rounded-full border border-slate-700 hover:border-slate-500 text-slate-300 text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
@@ -57,6 +61,7 @@ export const NomineeCard: React.FC<NomineeCardProps> = ({ nominee, onVoteClick, 
             <Eye className="w-3.5 h-3.5" />
             Profil
           </Link>
+          )}
           <button
             onClick={() => onVoteClick(nominee)}
             className="flex-1 btn-gold py-2.5 px-3 text-xs uppercase font-extrabold flex items-center justify-center gap-1.5"

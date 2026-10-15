@@ -70,7 +70,7 @@ export const Navbar: React.FC = () => {
               to="/submit-proposal"
               className="flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-bold text-gold-300 border border-gold-400/40 hover:border-gold-400 bg-gold-400/10 hover:bg-gold-400/20 transition-all shadow-gold-glow"
             >
-              <Sparkles className="w-3.5 h-3.5" />
+            
               <span>Proposer un candidat</span>
             </Link>
 

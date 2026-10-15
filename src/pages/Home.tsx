@@ -39,6 +39,7 @@ export const Home: React.FC = () => {
 
         // Fetch active edition
         const edRes = await api.get('/admin/editions');
+       
         if (edRes.data.success && edRes.data.data.length > 0) {
           setActiveEdition(edRes.data.data[0]);
         }
@@ -118,7 +119,7 @@ export const Home: React.FC = () => {
             <p className="text-xs font-bold text-gold-400 uppercase tracking-widest mb-2">
               Grande Soirée de Gala dans :
             </p>
-            <CountdownTimer targetDate={activeEdition?.ceremonyDate || '2026-11-28T20:00:00'} />
+            <CountdownTimer targetDate={activeEdition?.ceremonyDate || '2026-11-04T20:00:00'} />
           </motion.div>
 
           {/* CTA Buttons */}

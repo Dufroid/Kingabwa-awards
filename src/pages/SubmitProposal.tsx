@@ -63,7 +63,7 @@ export const SubmitProposal: React.FC = () => {
       {/* Title */}
       <div className="text-center space-y-3">
         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-gold-400/30 bg-gold-400/10 text-gold-300 text-xs font-bold uppercase tracking-widest">
-          <Sparkles className="w-4 h-4" />
+         
           <span>Participation Citoyenne</span>
         </div>
         <h1 className="font-serif text-3xl sm:text-4xl font-black uppercase text-white">
