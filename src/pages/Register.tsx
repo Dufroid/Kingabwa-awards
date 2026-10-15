@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Award, Mail, Lock, User, UserPlus } from 'lucide-react';
+import { Award, Lock, User, UserPlus, Smartphone } from 'lucide-react';
 import api from '../services/api.js';
 import { useAuth } from '../context/AuthContext.js';
 import { useToast } from '../context/ToastContext.js';
@@ -9,7 +9,7 @@ export const Register: React.FC = () => {
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
-    email: '',
+    phone: '',
     password: '',
   });
   const [submitting, setSubmitting] = useState(false);
@@ -24,9 +24,18 @@ export const Register: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!formData.phone.trim()) {
+      showToast('Le numéro de téléphone est requis.', 'error');
+      return;
+    }
+
     setSubmitting(true);
     try {
-      const res = await api.post('/auth/register', formData);
+      const res = await api.post('/auth/register', {
+        ...formData,
+        phone: formData.phone.trim(),
+      });
       if (res.data.success) {
         login(res.data.token, res.data.refreshToken, res.data.user);
         showToast('Compte créé avec succès ! Vous pouvez maintenant voter.', 'success');
@@ -80,18 +89,18 @@ export const Register: React.FC = () => {
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1">Adresse E-mail *</label>
+            <label className="block text-xs font-semibold text-slate-300 mb-1">Numéro de téléphone *</label>
             <div className="relative">
               <input
-                type="email"
-                name="email"
+                type="tel"
+                name="phone"
                 required
-                value={formData.email}
+                value={formData.phone}
                 onChange={handleChange}
-                placeholder="votre.email@exemple.cd"
+                placeholder="+243 82 000 0000"
                 className="w-full bg-dark-900 border border-slate-800 rounded-xl px-4 py-3 pl-10 text-xs text-white focus:outline-none focus:border-gold-400"
               />
-              <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-3.5" />
+              <Smartphone className="w-4 h-4 text-slate-400 absolute left-3 top-3.5" />
             </div>
           </div>
 

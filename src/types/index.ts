@@ -5,7 +5,8 @@ export interface User {
   _id?: string;
   firstName: string;
   lastName: string;
-  email: string;
+  email?: string;
+  phone?: string;
   role: UserRole;
   profileImage?: string;
 }

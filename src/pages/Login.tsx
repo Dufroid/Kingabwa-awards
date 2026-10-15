@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Award, Mail, Lock, LogIn } from 'lucide-react';
+import { Award, Lock, LogIn, Smartphone } from 'lucide-react';
 import api from '../services/api.js';
 import { useAuth } from '../context/AuthContext.js';
 import { useToast } from '../context/ToastContext.js';
 
 export const Login: React.FC = () => {
-  const [email, setEmail] = useState('');
+  const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
@@ -18,7 +18,7 @@ export const Login: React.FC = () => {
     e.preventDefault();
     setSubmitting(true);
     try {
-      const res = await api.post('/auth/login', { email, password });
+      const res = await api.post('/auth/login', { identifier, password });
       if (res.data.success) {
         login(res.data.token, res.data.refreshToken, res.data.user);
         showToast('Bienvenue ! Connexion réussie.', 'success');
@@ -49,17 +49,17 @@ export const Login: React.FC = () => {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1">Adresse E-mail</label>
+            <label className="block text-xs font-semibold text-slate-300 mb-1">Numéro de téléphone</label>
             <div className="relative">
               <input
-                type="email"
+                type="text"
                 required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="votre.email@exemple.cd"
+                value={identifier}
+                onChange={(e) => setIdentifier(e.target.value)}
+                placeholder="+243 82 000 0000"
                 className="w-full bg-dark-900 border border-slate-800 rounded-xl px-4 py-3 pl-10 text-xs text-white focus:outline-none focus:border-gold-400"
               />
-              <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-3.5" />
+              <Smartphone className="w-4 h-4 text-slate-400 absolute left-3 top-3.5" />
             </div>
           </div>
 
@@ -96,7 +96,7 @@ export const Login: React.FC = () => {
           <div className="flex gap-2">
             <button
               onClick={() => {
-                setEmail('admin@kingabwa-awards.cd');
+                setIdentifier('+243000000000');
                 setPassword('Admin@2026');
               }}
               className="flex-1 py-1.5 bg-dark-800 text-[10px] text-slate-300 rounded border border-slate-700 hover:border-gold-400"
@@ -105,7 +105,7 @@ export const Login: React.FC = () => {
             </button>
             <button
               onClick={() => {
-                setEmail('voter@kingabwa-awards.cd');
+                setIdentifier('+243000000001');
                 setPassword('Voter@2026');
               }}
               className="flex-1 py-1.5 bg-dark-800 text-[10px] text-slate-300 rounded border border-slate-700 hover:border-gold-400"

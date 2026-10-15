@@ -24,6 +24,8 @@ export const VotingModal: React.FC<VotingModalProps> = ({
 }) => {
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [voteType, setVoteType] = useState<'FREE' | 'PAID'>('FREE');
+  const [paymentPhone, setPaymentPhone] = useState('+243');
   const { showToast } = useToast();
 
   if (!isOpen || !nominee || !category) return null;
@@ -31,11 +33,23 @@ export const VotingModal: React.FC<VotingModalProps> = ({
   const handleConfirmVote = async () => {
     setSubmitting(true);
     try {
-      const res = await api.post('/votes', {
-        editionId,
-        categoryId: category._id,
-        nomineeId: nominee._id,
-      });
+      const payload = voteType === 'PAID'
+        ? {
+            editionId,
+            categoryId: category._id,
+            nomineeId: nominee._id,
+            phone: paymentPhone,
+            provider: 'MOCK',
+          }
+        : {
+            editionId,
+            categoryId: category._id,
+            nomineeId: nominee._id,
+            voteType,
+          };
+
+      const endpoint = voteType === 'PAID' ? '/payments/mobile-money/initiate' : '/votes';
+      const res = await api.post(endpoint, payload);
 
       if (res.data.success) {
         setSuccess(true);
@@ -99,11 +113,59 @@ export const VotingModal: React.FC<VotingModalProps> = ({
                 </div>
               </div>
 
-              {/* Notice prompt requirement */}
+              <div className="space-y-3">
+                <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider">
+                  Choisissez votre type de vote
+                </label>
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setVoteType('FREE')}
+                    className={`rounded-xl border p-3 text-left transition ${
+                      voteType === 'FREE'
+                        ? 'border-gold-400 bg-gold-500/10 text-gold-200'
+                        : 'border-slate-700 bg-dark-900 text-slate-300'
+                    }`}
+                  >
+                    <div className="text-xs font-bold uppercase">Vote gratuit</div>
+                    <div className="text-[10px] text-slate-400 mt-1">1 point</div>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setVoteType('PAID')}
+                    className={`rounded-xl border p-3 text-left transition ${
+                      voteType === 'PAID'
+                        ? 'border-emerald-400 bg-emerald-500/10 text-emerald-200'
+                        : 'border-slate-700 bg-dark-900 text-slate-300'
+                    }`}
+                  >
+                    <div className="text-xs font-bold uppercase">Vote payant</div>
+                    <div className="text-[10px] text-slate-400 mt-1">10 points • paiement requis</div>
+                  </button>
+                </div>
+              </div>
+
+              {voteType === 'PAID' && (
+                <div className="space-y-2">
+                  <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider">
+                    Numéro mobile money
+                  </label>
+                  <input
+                    type="tel"
+                    value={paymentPhone}
+                    onChange={(e) => setPaymentPhone(e.target.value)}
+                    placeholder="+243 82 000 0000"
+                    className="w-full bg-dark-900 border border-slate-800 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-gold-400"
+                  />
+                </div>
+              )}
+
               <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-4 flex items-start gap-3">
                 <AlertTriangle className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
                 <p className="text-xs text-amber-200 leading-relaxed">
-                  Vous êtes sur le point de voter pour <strong className="text-white">{nominee.fullName}</strong> dans la catégorie <strong className="text-white">{category.name}</strong>. Cette action est définitive et enregistre votre voix de manière sécurisée.
+                  {voteType === 'FREE'
+                    ? 'Votre vote gratuit est limité à un par utilisateur et par catégorie. Il est comptabilisé immédiatement.'
+                    : 'Votre vote payant est facturé 10 points et le paiement mobile money doit être confirmé avant validation du vote.'}
                 </p>
               </div>
 
@@ -122,7 +184,7 @@ export const VotingModal: React.FC<VotingModalProps> = ({
                   onClick={handleConfirmVote}
                   className="flex-1 btn-gold py-3 px-4 text-xs font-extrabold uppercase tracking-wider disabled:opacity-50"
                 >
-                  {submitting ? 'Enregistrement...' : 'Confirmer mon vote'}
+                  {submitting ? 'Enregistrement...' : voteType === 'FREE' ? 'Confirmer mon vote gratuit' : 'Confirmer mon vote payant'}
                 </button>
               </div>
             </div>
