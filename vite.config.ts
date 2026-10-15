@@ -7,7 +7,7 @@ export default defineConfig({
     port: 5173,
     proxy: {
       '/api': {
-        target: 'https://kingabwaawards.netlify.app:5000',
+        target: 'https://kingabwaback.onrender.com',
         changeOrigin: true,
       },
     },
