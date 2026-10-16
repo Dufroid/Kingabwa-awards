@@ -84,11 +84,13 @@ export interface BlogPost {
     _id: string;
     name: string;
     slug: string;
-  };
+  } | string | null;
   tags: string[];
   status: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED';
   publishedAt: string;
   readTimeMinutes: number;
+  metaTitle?: string;
+  metaDescription?: string;
 }
 
 export interface Partner {

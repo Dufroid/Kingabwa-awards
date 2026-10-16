@@ -55,7 +55,7 @@ export const BlogDetail: React.FC = () => {
       {/* Header */}
       <div className="space-y-4">
         <span className="bg-gold-400/20 text-gold-300 border border-gold-400/40 text-xs font-bold uppercase px-4 py-1.5 rounded-full inline-block">
-          {post.categoryId?.name || 'Communiqué Officiel'}
+          {typeof post.categoryId === 'object' && post.categoryId ? post.categoryId.name : 'Communiqué Officiel'}
         </span>
         <h1 className="font-serif text-3xl sm:text-5xl font-black text-white leading-tight">
           {post.title}

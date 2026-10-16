@@ -335,7 +335,7 @@ export const Home: React.FC = () => {
                 <div className="h-48 overflow-hidden relative">
                   <img src={post.featuredImage} alt={post.title} className="w-full h-full object-cover" />
                   <span className="absolute top-3 left-3 bg-dark-950/80 backdrop-blur-md text-gold-300 border border-gold-400/30 text-[10px] uppercase font-bold px-3 py-1 rounded-full">
-                    {post.categoryId?.name || 'Actualité'}
+                    {typeof post.categoryId === 'object' && post.categoryId ? post.categoryId.name : 'Actualité'}
                   </span>
                 </div>
                 <div className="p-6 space-y-3">

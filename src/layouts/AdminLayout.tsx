@@ -13,6 +13,7 @@ import {
   FolderTree,
   Wallet,
   CalendarRange,
+  Handshake,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.js';
 
@@ -41,6 +42,8 @@ export const AdminLayout: React.FC = () => {
     { name: 'Catégories', path: '/admin/categories', icon: FolderTree },
     { name: 'Nominés', path: '/admin/nominees', icon: Award },
     { name: 'Éditions', path: '/admin/editions', icon: CalendarRange },
+    { name: 'Blog', path: '/admin/blog', icon: Newspaper },
+    { name: 'Partenaires', path: '/admin/partners', icon: Handshake },
     { name: 'Statistiques Votes', path: '/admin/votes', icon: Vote },
     { name: 'Transactions', path: '/admin/transactions', icon: Wallet },
     { name: 'Propositions Reçues', path: '/admin/proposals', icon: Sparkles },

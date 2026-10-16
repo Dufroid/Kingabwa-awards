@@ -79,7 +79,7 @@ export const Blog: React.FC = () => {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-dark-950 via-transparent to-transparent" />
                 <span className="absolute top-3 left-3 bg-dark-950/80 backdrop-blur-md text-gold-300 border border-gold-400/30 text-[10px] uppercase font-bold px-3 py-1 rounded-full">
-                  {post.categoryId?.name || 'Événement'}
+                  {typeof post.categoryId === 'object' && post.categoryId ? post.categoryId.name : 'Événement'}
                 </span>
               </div>
 
