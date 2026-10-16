@@ -16,6 +16,8 @@ export interface AwardEdition {
   name: string;
   year: number;
   description: string;
+  location?: string;
+  image?: string;
   startDate: string;
   ceremonyDate: string;
   votingStartDate: string;

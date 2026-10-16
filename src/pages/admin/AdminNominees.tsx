@@ -10,6 +10,7 @@ export const AdminNominees: React.FC = () => {
   const [editions, setEditions] = useState<AwardEdition[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [imagePreview, setImagePreview] = useState<string>('');
@@ -68,7 +69,41 @@ export const AdminNominees: React.FC = () => {
     setImagePreview('');
   }, [selectedFile, formData.profileImage]);
 
-  const handleCreate = async (e: React.FormEvent) => {
+  const resetForm = () => {
+    setSelectedFile(null);
+    setUploadingImage(false);
+    setImagePreview('');
+    setEditingId(null);
+    setFormData({
+      editionId: editions[0]?._id || '',
+      categoryId: categories[0]?._id || '',
+      fullName: '',
+      profileImage: '',
+    });
+  };
+
+  const openCreateModal = () => {
+    resetForm();
+    setShowModal(true);
+  };
+
+  const openEditModal = (nominee: Nominee) => {
+    const categoryId = typeof nominee.categoryId === 'object' ? nominee.categoryId._id : nominee.categoryId;
+    const editionId = typeof nominee.editionId === 'object' ? nominee.editionId._id : nominee.editionId;
+
+    setEditingId(nominee._id);
+    setFormData({
+      editionId: editionId || editions[0]?._id || '',
+      categoryId: categoryId || categories[0]?._id || '',
+      fullName: nominee.fullName,
+      profileImage: nominee.profileImage || '',
+    });
+    setImagePreview(nominee.profileImage || '');
+    setSelectedFile(null);
+    setShowModal(true);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
@@ -95,24 +130,27 @@ export const AdminNominees: React.FC = () => {
         profileImage: uploadedImageUrl,
       };
 
+      if (editingId) {
+        const res = await api.patch(`/nominees/${editingId}`, payload);
+        if (res.data.success) {
+          showToast('Nominé modifié avec succès !', 'success');
+          setShowModal(false);
+          resetForm();
+          fetchNominees();
+        }
+        return;
+      }
+
       const res = await api.post('/nominees', payload);
       if (res.data.success) {
         showToast('Candidat ajouté avec succès !', 'success');
         setShowModal(false);
-        setSelectedFile(null);
-        setUploadingImage(false);
-        setImagePreview('');
-        setFormData({
-          editionId: formData.editionId,
-          categoryId: formData.categoryId,
-          fullName: '',
-          profileImage: '',
-        });
+        resetForm();
         fetchNominees();
       }
     } catch (err: any) {
       setUploadingImage(false);
-      showToast(err.response?.data?.message || 'Erreur lors de la création', 'error');
+      showToast(err.response?.data?.message || 'Erreur lors de l\'enregistrement', 'error');
     }
   };
 
@@ -137,7 +175,7 @@ export const AdminNominees: React.FC = () => {
           <p className="text-xs text-slate-400">Gérez les profils et suivez les votes cumulés des candidats.</p>
         </div>
         <button
-          onClick={() => setShowModal(true)}
+          onClick={openCreateModal}
           className="btn-gold px-4 py-2 text-xs font-bold uppercase flex items-center gap-2"
         >
           <Plus className="w-4 h-4" />
@@ -151,6 +189,7 @@ export const AdminNominees: React.FC = () => {
             <tr>
               <th className="p-4">Candidat</th>
               <th className="p-4">Catégorie</th>
+              <th className="p-4">Identifiant</th>
               <th className="p-4">Votes Cumulés</th>
               <th className="p-4 text-right">Actions</th>
             </tr>
@@ -165,11 +204,17 @@ export const AdminNominees: React.FC = () => {
                 <td className="p-4 font-medium text-gold-300">
                   {typeof nom.categoryId === 'object' ? nom.categoryId.name : '-'}
                 </td>
+                <td className="p-4 font-mono text-[10px] text-slate-400">{nom._id}</td>
                 <td className="p-4 font-serif font-extrabold text-gold-gradient text-sm">{nom.voteCount || 0}</td>
                 <td className="p-4 text-right">
-                  <button onClick={() => handleDelete(nom._id)} className="p-1.5 text-slate-400 hover:text-red-400">
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+                  <div className="flex items-center justify-end gap-2">
+                    <button onClick={() => openEditModal(nom)} className="p-1.5 text-slate-400 hover:text-gold-400">
+                      Modifier
+                    </button>
+                    <button onClick={() => handleDelete(nom._id)} className="p-1.5 text-slate-400 hover:text-red-400">
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}
@@ -180,8 +225,10 @@ export const AdminNominees: React.FC = () => {
       {showModal && (
         <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
           <div className="glass-card max-w-lg w-full rounded-2xl p-6 border border-gold-400/30 space-y-4">
-            <h3 className="font-serif text-lg font-bold text-gold-gradient">Ajouter un Nominé</h3>
-            <form onSubmit={handleCreate} className="space-y-3">
+            <h3 className="font-serif text-lg font-bold text-gold-gradient">
+              {editingId ? 'Modifier le Nominé' : 'Ajouter un Nominé'}
+            </h3>
+            <form onSubmit={handleSubmit} className="space-y-3">
               <div>
                 <label className="block text-xs font-semibold text-slate-300 mb-1">Catégorie *</label>
                 <select
@@ -206,6 +253,12 @@ export const AdminNominees: React.FC = () => {
               </div>
               <div>
                 <label className="block text-xs font-semibold text-slate-300 mb-1">Photo de profil *</label>
+
+                {editingId && (
+                  <div className="mb-3 rounded-xl border border-slate-800 bg-dark-900 px-3 py-2 text-[10px] text-slate-400">
+                    Identifiant MongoDB : <span className="font-mono text-gold-300">{editingId}</span>
+                  </div>
+                )}
 
                 <div className="flex items-center gap-3">
                   <label className="inline-flex cursor-pointer items-center justify-center rounded-full bg-gold-500 px-4 py-2 text-[10px] font-bold uppercase text-dark-950 shadow-gold-glow transition hover:opacity-90">
@@ -255,11 +308,14 @@ export const AdminNominees: React.FC = () => {
                 />
               </div>
               <div className="flex gap-2 pt-2">
-                <button type="button" onClick={() => setShowModal(false)} className="flex-1 py-2 text-xs text-slate-400">
+                <button type="button" onClick={() => {
+                  setShowModal(false);
+                  resetForm();
+                }} className="flex-1 py-2 text-xs text-slate-400">
                   Annuler
                 </button>
                 <button type="submit" disabled={uploadingImage} className="flex-1 btn-gold py-2 text-xs uppercase font-bold disabled:opacity-60">
-                  {uploadingImage ? 'Téléchargement...' : 'Enregistrer'}
+                  {uploadingImage ? 'Téléchargement...' : editingId ? 'Mettre à jour' : 'Enregistrer'}
                 </button>
               </div>
             </form>

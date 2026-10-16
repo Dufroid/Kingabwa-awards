@@ -26,6 +26,7 @@ import { AdminLayout } from './layouts/AdminLayout.js';
 import { AdminDashboard } from './pages/admin/AdminDashboard.js';
 import { AdminCategories } from './pages/admin/AdminCategories.js';
 import { AdminNominees } from './pages/admin/AdminNominees.js';
+import { AdminEditions } from './pages/admin/AdminEditions.js';
 import { AdminVotes } from './pages/admin/AdminVotes.js';
 import { AdminProposals } from './pages/admin/AdminProposals.js';
 import { AdminUsers } from './pages/admin/AdminUsers.js';
@@ -73,6 +74,7 @@ export const App: React.FC = () => {
               <Route index element={<AdminDashboard />} />
               <Route path="categories" element={<AdminCategories />} />
               <Route path="nominees" element={<AdminNominees />} />
+              <Route path="editions" element={<AdminEditions />} />
               <Route path="votes" element={<AdminVotes />} />
               <Route path="transactions" element={<AdminTransactions />} />
               <Route path="proposals" element={<AdminProposals />} />
