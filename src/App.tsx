@@ -29,6 +29,7 @@ import { AdminNominees } from './pages/admin/AdminNominees.js';
 import { AdminVotes } from './pages/admin/AdminVotes.js';
 import { AdminProposals } from './pages/admin/AdminProposals.js';
 import { AdminUsers } from './pages/admin/AdminUsers.js';
+import { AdminTransactions } from './pages/admin/AdminTransactions.js';
 
 // Public Layout Wrapper
 const PublicLayout: React.FC = () => {
@@ -73,6 +74,7 @@ export const App: React.FC = () => {
               <Route path="categories" element={<AdminCategories />} />
               <Route path="nominees" element={<AdminNominees />} />
               <Route path="votes" element={<AdminVotes />} />
+              <Route path="transactions" element={<AdminTransactions />} />
               <Route path="proposals" element={<AdminProposals />} />
               <Route path="users" element={<AdminUsers />} />
             </Route>

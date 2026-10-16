@@ -12,65 +12,44 @@ interface NomineeCardProps {
 export const NomineeCard: React.FC<NomineeCardProps> = ({ nominee, onVoteClick, hasVoted }) => {
   const categoryName = typeof nominee.categoryId === 'object' ? nominee.categoryId.name : '';
 
-  return (
-    <div className="glass-card glass-card-hover rounded-2xl overflow-hidden flex flex-col justify-between group">
-      {/* Image container */}
-      <div className="relative h-64 overflow-hidden bg-dark-900">
-        <img
-          src={nominee.profileImage}
-          alt={nominee.fullName}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-dark-950 via-dark-950/20 to-transparent" />
-        
-        {categoryName && (
-          <span className="absolute top-3 left-3 bg-dark-950/80 backdrop-blur-md text-gold-300 border border-gold-400/30 text-[10px] uppercase font-bold px-3 py-1 rounded-full shadow-lg">
-            {categoryName}
-          </span>
-        )}
+ return (
+   <div className="glass-card glass-card-hover rounded-2xl overflow-hidden flex flex-col justify-between group">
+     <div className="relative h-72 overflow-hidden bg-dark-900">
+       <img
+         src={nominee.profileImage}
+         alt={nominee.fullName}
+         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+       />
+       <div className="absolute inset-0 bg-gradient-to-t from-dark-950 via-dark-950/20 to-transparent" />
 
-        {hasVoted && (
-          <span className="absolute top-3 right-3 bg-emerald-500 text-dark-950 font-black text-[10px] uppercase px-2.5 py-1 rounded-full flex items-center gap-1 shadow-lg">
-            <CheckCircle2 className="w-3.5 h-3.5" /> Voté
-          </span>
-        )}
+       {categoryName && (
+         <span className="absolute top-3 left-3 bg-dark-950/80 backdrop-blur-md text-gold-300 border border-gold-400/30 text-[10px] uppercase font-bold px-3 py-1 rounded-full shadow-lg">
+           {categoryName}
+         </span>
+       )}
 
-        <div className="absolute bottom-3 left-4 right-4">
-          <h3 className="font-serif text-xl font-extrabold text-white group-hover:text-gold-gradient transition-colors">
-            {nominee.fullName}
-          </h3>
-        </div>
-      </div>
+       {hasVoted && (
+         <span className="absolute top-3 right-3 bg-emerald-500 text-dark-950 font-black text-[10px] uppercase px-2.5 py-1 rounded-full flex items-center gap-1 shadow-lg">
+           <CheckCircle2 className="w-3.5 h-3.5" /> Voté
+         </span>
+       )}
 
-      {/* Body content */}
-      <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
-        {!nominee.shortBio &&(
- <p className="text-slate-300 text-xs leading-relaxed line-clamp-3">
-          {nominee.shortBio}
-        </p>
-        )} 
-       
+       <div className="absolute bottom-4 left-4 right-4">
+         <h3 className="font-serif text-xl font-extrabold text-white group-hover:text-gold-gradient transition-colors">
+           {nominee.fullName}
+         </h3>
+       </div>
+     </div>
 
-        {/* Action Buttons */}
-        <div className="flex items-center gap-2 pt-2 border-t border-slate-800">
-          {nominee.slug && (
-          <Link
-            to={`/nominees/${nominee.slug}`}
-            className="flex-1 py-2.5 px-3 rounded-full border border-slate-700 hover:border-slate-500 text-slate-300 text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
-          >
-            <Eye className="w-3.5 h-3.5" />
-            Profil
-          </Link>
-          )}
-          <button
-            onClick={() => onVoteClick(nominee)}
-            className="flex-1 btn-gold py-2.5 px-3 text-xs uppercase font-extrabold flex items-center justify-center gap-1.5"
-          >
-            <Vote className="w-3.5 h-3.5" />
-            Voter
-          </button>
-        </div>
-      </div>
-    </div>
-  );
+     <div className="p-4">
+       <button
+         onClick={() => onVoteClick(nominee)}
+         className="w-full btn-gold py-2.5 px-3 text-xs uppercase font-extrabold flex items-center justify-center gap-1.5"
+       >
+         <Vote className="w-3.5 h-3.5" />
+         Voter
+       </button>
+     </div>
+   </div>
+ );
 };

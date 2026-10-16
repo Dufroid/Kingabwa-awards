@@ -10,14 +10,15 @@ export const AdminNominees: React.FC = () => {
   const [editions, setEditions] = useState<AwardEdition[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [imagePreview, setImagePreview] = useState<string>('');
 
   const [formData, setFormData] = useState({
     editionId: '',
     categoryId: '',
     fullName: '',
     profileImage: '',
-    shortBio: '',
-    biography: '',
   });
 
   const { showToast } = useToast();
@@ -52,16 +53,65 @@ export const AdminNominees: React.FC = () => {
     fetchNominees();
   }, []);
 
+  useEffect(() => {
+    if (selectedFile) {
+      const objectUrl = URL.createObjectURL(selectedFile);
+      setImagePreview(objectUrl);
+      return () => URL.revokeObjectURL(objectUrl);
+    }
+
+    if (formData.profileImage) {
+      setImagePreview(formData.profileImage);
+      return;
+    }
+
+    setImagePreview('');
+  }, [selectedFile, formData.profileImage]);
+
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
+
     try {
-      const res = await api.post('/nominees', formData);
+      let uploadedImageUrl = formData.profileImage;
+
+      if (selectedFile) {
+        setUploadingImage(true);
+        const formDataUpload = new FormData();
+        formDataUpload.append('image', selectedFile);
+
+        const uploadRes = await api.post('/nominees/upload-image', formDataUpload, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+
+        uploadedImageUrl = uploadRes.data?.data?.url || uploadRes.data?.url || uploadedImageUrl;
+        setFormData((prev) => ({ ...prev, profileImage: uploadedImageUrl }));
+        setUploadingImage(false);
+      }
+
+      const payload = {
+        ...formData,
+        profileImage: uploadedImageUrl,
+      };
+
+      const res = await api.post('/nominees', payload);
       if (res.data.success) {
         showToast('Candidat ajouté avec succès !', 'success');
         setShowModal(false);
+        setSelectedFile(null);
+        setUploadingImage(false);
+        setImagePreview('');
+        setFormData({
+          editionId: formData.editionId,
+          categoryId: formData.categoryId,
+          fullName: '',
+          profileImage: '',
+        });
         fetchNominees();
       }
     } catch (err: any) {
+      setUploadingImage(false);
       showToast(err.response?.data?.message || 'Erreur lors de la création', 'error');
     }
   };
@@ -101,7 +151,6 @@ export const AdminNominees: React.FC = () => {
             <tr>
               <th className="p-4">Candidat</th>
               <th className="p-4">Catégorie</th>
-              <th className="p-4">Courte Bio</th>
               <th className="p-4">Votes Cumulés</th>
               <th className="p-4 text-right">Actions</th>
             </tr>
@@ -116,7 +165,6 @@ export const AdminNominees: React.FC = () => {
                 <td className="p-4 font-medium text-gold-300">
                   {typeof nom.categoryId === 'object' ? nom.categoryId.name : '-'}
                 </td>
-                <td className="p-4 max-w-xs truncate">{nom.shortBio}</td>
                 <td className="p-4 font-serif font-extrabold text-gold-gradient text-sm">{nom.voteCount || 0}</td>
                 <td className="p-4 text-right">
                   <button onClick={() => handleDelete(nom._id)} className="p-1.5 text-slate-400 hover:text-red-400">
@@ -157,42 +205,61 @@ export const AdminNominees: React.FC = () => {
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">URL de la photo de profil *</label>
+                <label className="block text-xs font-semibold text-slate-300 mb-1">Photo de profil *</label>
+
+                <div className="flex items-center gap-3">
+                  <label className="inline-flex cursor-pointer items-center justify-center rounded-full bg-gold-500 px-4 py-2 text-[10px] font-bold uppercase text-dark-950 shadow-gold-glow transition hover:opacity-90">
+                    <span>Choisir image</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0] || null;
+                        setSelectedFile(file);
+                        if (!file) return;
+                        if (!formData.profileImage) {
+                          setFormData((prev) => ({ ...prev, profileImage: '' }));
+                        }
+                      }}
+                    />
+                  </label>
+
+                  {selectedFile && (
+                    <span className="text-[10px] text-slate-300">{selectedFile.name}</span>
+                  )}
+                </div>
+
+                {imagePreview && (
+                  <div className="mt-4 overflow-hidden rounded-2xl border border-slate-800 bg-dark-900 p-2">
+                    <img
+                      src={imagePreview}
+                      alt="Aperçu du nominé"
+                      className="h-40 w-full rounded-xl object-cover"
+                    />
+                  </div>
+                )}
+
+                <p className="mt-3 text-[10px] text-slate-400">Ou colle directement une URL publique :</p>
                 <input
                   type="text"
-                  required
                   value={formData.profileImage}
-                  onChange={(e) => setFormData({ ...formData, profileImage: e.target.value })}
+                  onChange={(e) => {
+                    setFormData({ ...formData, profileImage: e.target.value });
+                    if (!e.target.value) {
+                      setSelectedFile(null);
+                    }
+                  }}
                   placeholder="https://..."
-                  className="w-full bg-dark-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">Courte Bio *</label>
-                <input
-                  type="text"
-                  required
-                  value={formData.shortBio}
-                  onChange={(e) => setFormData({ ...formData, shortBio: e.target.value })}
-                  className="w-full bg-dark-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">Biographie complète *</label>
-                <textarea
-                  required
-                  rows={3}
-                  value={formData.biography}
-                  onChange={(e) => setFormData({ ...formData, biography: e.target.value })}
-                  className="w-full bg-dark-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white"
+                  className="mt-2 w-full bg-dark-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white"
                 />
               </div>
               <div className="flex gap-2 pt-2">
                 <button type="button" onClick={() => setShowModal(false)} className="flex-1 py-2 text-xs text-slate-400">
                   Annuler
                 </button>
-                <button type="submit" className="flex-1 btn-gold py-2 text-xs uppercase font-bold">
-                  Enregistrer
+                <button type="submit" disabled={uploadingImage} className="flex-1 btn-gold py-2 text-xs uppercase font-bold disabled:opacity-60">
+                  {uploadingImage ? 'Téléchargement...' : 'Enregistrer'}
                 </button>
               </div>
             </form>

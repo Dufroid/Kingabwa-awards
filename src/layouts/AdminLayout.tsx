@@ -11,6 +11,7 @@ import {
   ShieldAlert,
   LogOut,
   FolderTree,
+  Wallet,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.js';
 
@@ -39,6 +40,7 @@ export const AdminLayout: React.FC = () => {
     { name: 'Catégories', path: '/admin/categories', icon: FolderTree },
     { name: 'Nominés', path: '/admin/nominees', icon: Award },
     { name: 'Statistiques Votes', path: '/admin/votes', icon: Vote },
+    { name: 'Transactions', path: '/admin/transactions', icon: Wallet },
     { name: 'Propositions Reçues', path: '/admin/proposals', icon: Sparkles },
     { name: 'Gestion Utilisateurs', path: '/admin/users', icon: Users },
   ];

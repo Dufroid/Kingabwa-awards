@@ -43,8 +43,8 @@ export interface Nominee {
   fullName: string;
   slug: string;
   profileImage: string;
-  shortBio: string;
-  biography: string;
+  shortBio?: string;
+  biography?: string;
   achievements: string[];
   socialLinks?: {
     facebook?: string;

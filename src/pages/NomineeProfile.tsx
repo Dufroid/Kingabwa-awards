@@ -87,10 +87,7 @@ export const NomineeProfile: React.FC = () => {
             <h1 className="font-serif text-3xl sm:text-4xl font-extrabold text-white">
               {nominee.fullName}
             </h1>
-            <p className="text-gold-300 text-sm font-medium italic mt-1">{nominee.shortBio}</p>
           </div>
-
-          <p className="text-slate-300 text-sm leading-relaxed">{nominee.biography}</p>
 
           {/* Social Links */}
           {nominee.socialLinks && (
