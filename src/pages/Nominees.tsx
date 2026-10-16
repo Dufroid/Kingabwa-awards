@@ -36,7 +36,10 @@ export const Nominees: React.FC = () => {
         if (nomRes.data.success) setNominees(nomRes.data.data);
         if (catRes.data.success) setCategories(catRes.data.data);
         if (edRes.data.success && edRes.data.data.length > 0) {
-          setActiveEdition(edRes.data.data[0]);
+          const selectedEdition =
+            edRes.data.data.find((edition: AwardEdition) => edition.status === 'OPEN') ||
+            edRes.data.data[0];
+          setActiveEdition(selectedEdition || null);
         }
       } catch (err) {
         console.error('Failed to load nominees', err);
@@ -77,13 +80,13 @@ export const Nominees: React.FC = () => {
       <div className="text-center max-w-3xl mx-auto space-y-4">
         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-gold-400/30 bg-gold-400/10 text-gold-300 text-xs font-bold uppercase tracking-widest">
           <Users className="w-4 h-4" />
-          <span>Édition 2026</span>
+          <span>{activeEdition ? `${activeEdition.name} • ${activeEdition.year}` : 'Édition en cours'}</span>
         </div>
         <h1 className="font-serif text-4xl sm:text-5xl font-black uppercase text-white tracking-tight">
           Candidats & <span className="text-gold-gradient">Nominés Officiels</span>
         </h1>
         <p className="text-slate-300 text-sm sm:text-base leading-relaxed">
-          Découvrez le profil des personnalités en compétition et soutenez votre candidat favori.
+          {activeEdition?.description || 'Découvrez le profil des personnalités en compétition et soutenez votre candidat favori.'}
         </p>
       </div>
 

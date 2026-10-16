@@ -39,9 +39,12 @@ export const Home: React.FC = () => {
 
         // Fetch active edition
         const edRes = await api.get('/admin/editions');
-       
+
         if (edRes.data.success && edRes.data.data.length > 0) {
-          setActiveEdition(edRes.data.data[0]);
+          const selectedEdition =
+            edRes.data.data.find((edition: AwardEdition) => edition.status === 'OPEN') ||
+            edRes.data.data[0];
+          setActiveEdition(selectedEdition || null);
         }
       } catch (err) {
         console.error('Error fetching home data', err);
@@ -86,7 +89,7 @@ export const Home: React.FC = () => {
           >
             
             <span className="text-xs font-bold uppercase tracking-widest">
-             KINGABWA AWARDS 2026 • 2ème Édition
+             {activeEdition ? `${activeEdition.name} • ${activeEdition.year}` : 'KINGABWA AWARDS 2026 • Édition'}
             </span>
           </motion.div>
 
@@ -154,7 +157,7 @@ export const Home: React.FC = () => {
               Célébrer la ferveur et l'impact positif de notre communauté.
             </h2>
             <p className="text-slate-300 text-sm leading-relaxed">
-              Kingabwa Awards est un événement socioculturel annuel dédié à la célébration, la reconnaissance et la récompense des talents, élites et personnalités qui font rayonner Kingabwa à travers leurs réalisations, leur engagement et leur impact dans différents domaines.
+              {activeEdition?.description || 'Kingabwa Awards est un événement socioculturel annuel dédié à la célébration, la reconnaissance et la récompense des talents, élites et personnalités qui font rayonner Kingabwa à travers leurs réalisations, leur engagement et leur impact dans différents domaines.'}
             </p>
             <div className="grid grid-cols-2 gap-4 pt-2">
               <div className="flex items-center gap-3">
@@ -179,14 +182,14 @@ export const Home: React.FC = () => {
           <div className="lg:col-span-5 relative">
             <div className="relative rounded-2xl overflow-hidden border-2 border-gold-400/40 shadow-gold-glow">
               <img
-                src="https://images.unsplash.com/photo-1511578314322-379afb476865?q=80&w=800"
-                alt="Soirée de Gala"
+                src={activeEdition?.image || 'https://images.unsplash.com/photo-1511578314322-379afb476865?q=80&w=800'}
+                alt={activeEdition?.name || 'Soirée de Gala'}
                 className="w-full h-80 object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-dark-950 via-transparent to-transparent" />
               <div className="absolute bottom-4 left-4 right-4 bg-dark-950/80 backdrop-blur-md p-4 rounded-xl border border-gold-400/30">
-                <p className="text-xs font-bold text-gold-gradient">Grande Cérémonie Annuelle</p>
-                <p className="text-[11px] text-slate-300">Aqua Splash 14 rue Limete poids lourds- Kinshasa</p>
+                <p className="text-xs font-bold text-gold-gradient">{activeEdition?.name || 'Grande Cérémonie Annuelle'}</p>
+                <p className="text-[11px] text-slate-300">{activeEdition?.location || 'Lieu à définir'}</p>
               </div>
             </div>
           </div>

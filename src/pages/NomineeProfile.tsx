@@ -25,7 +25,10 @@ export const NomineeProfile: React.FC = () => {
         }
         const edRes = await api.get('/admin/editions');
         if (edRes.data.success && edRes.data.data.length > 0) {
-          setActiveEdition(edRes.data.data[0]);
+          const selectedEdition =
+            edRes.data.data.find((edition: AwardEdition) => edition.status === 'OPEN') ||
+            edRes.data.data[0];
+          setActiveEdition(selectedEdition || null);
         }
       } catch (err) {
         console.error('Failed to fetch nominee profile', err);
