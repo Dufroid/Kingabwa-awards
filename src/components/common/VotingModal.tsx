@@ -64,8 +64,8 @@ export const VotingModal: React.FC<VotingModalProps> = ({
     {
       key: 'MOCK',
       label: 'Test local',
-      description: 'Simulation',
-      logo: '/logo.svg',
+     
+      logo: '/logo.png',
     },
   ] as const;
 
