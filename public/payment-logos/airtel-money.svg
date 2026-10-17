@@ -1,0 +1,7 @@
+<svg width="240" height="120" viewBox="0 0 240 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="240" height="120" rx="20" fill="#140E1A"/>
+  <rect x="8" y="8" width="224" height="104" rx="16" fill="#1A0F1E"/>
+  <circle cx="70" cy="60" r="28" fill="#FF2B55"/>
+  <path d="M58 60C58 50.059 66.059 42 76 42C82.5 42 88.3 45.2 92 50.7L81 60.2L92 69.7C88.3 75.3 82.5 78.5 76 78.5C66.059 78.5 58 70.441 58 60Z" fill="#FFF4F7" fill-opacity="0.2"/>
+  <text x="125" y="72" text-anchor="middle" fill="#FFDEE7" font-size="18" font-weight="800" font-family="Arial, sans-serif">AIRTEL MONEY</text>
+</svg>

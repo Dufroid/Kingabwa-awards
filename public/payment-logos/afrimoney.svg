@@ -1,0 +1,8 @@
+<svg width="240" height="120" viewBox="0 0 240 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="240" height="120" rx="20" fill="#081522"/>
+  <rect x="8" y="8" width="224" height="104" rx="16" fill="#0E1E2D"/>
+  <circle cx="68" cy="60" r="28" fill="#8B5CF6"/>
+  <path d="M55 60C55 50.059 63.059 42 73 42H79C88.941 42 97 50.059 97 60C97 69.941 88.941 78 79 78H73C63.059 78 55 69.941 55 60Z" stroke="#F5F3FF" stroke-width="4"/>
+  <path d="M71 51L79 60L71 69" stroke="#F5F3FF" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="125" y="72" text-anchor="middle" fill="#E9D5FF" font-size="18" font-weight="800" font-family="Arial, sans-serif">AFRIMONEY</text>
+</svg>

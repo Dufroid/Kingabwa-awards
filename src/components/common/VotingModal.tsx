@@ -25,7 +25,7 @@ export const VotingModal: React.FC<VotingModalProps> = ({
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
   const [voteType, setVoteType] = useState<'FREE' | 'PAID'>('FREE');
-  const [provider, setProvider] = useState<'AIRTEL_MONEY' | 'ORANGE_MONEY' | 'MOCK'>('AIRTEL_MONEY');
+  const [provider, setProvider] = useState<'MPESA' | 'ORANGE_MONEY' | 'AIRTEL_MONEY' | 'AFRIMONEY' | 'MOCK'>('MPESA');
   const [increments, setIncrements] = useState(10);
   const [paymentPhone, setPaymentPhone] = useState('+243');
   const [confirmationCode, setConfirmationCode] = useState('');
@@ -36,6 +36,39 @@ export const VotingModal: React.FC<VotingModalProps> = ({
     phone: string;
   } | null>(null);
   const { showToast } = useToast();
+
+  const paymentProviders = [
+    {
+      key: 'MPESA',
+      label: 'M-Pesa',
+      description: 'Kenia / East Africa',
+      logo: '/payment-logos/mpesa.svg',
+    },
+    {
+      key: 'ORANGE_MONEY',
+      label: 'Orange Money',
+      description: 'RDC / Afrique',
+      logo: '/payment-logos/orange-money.svg',
+    },
+    {
+      key: 'AIRTEL_MONEY',
+      label: 'Airtel Money',
+      description: 'RDC / Afrique',
+      logo: '/payment-logos/airtel-money.svg',
+    },
+    {
+      key: 'AFRIMONEY',
+      label: 'AfriMoney',
+      description: 'RDC / Afrique',
+      logo: '/payment-logos/afrimoney.svg',
+    },
+    {
+      key: 'MOCK',
+      label: 'Test local',
+      description: 'Simulation',
+      logo: '/logo.svg',
+    },
+  ] as const;
 
   if (!isOpen || !nominee || !category) return null;
 
@@ -128,7 +161,7 @@ export const VotingModal: React.FC<VotingModalProps> = ({
     setConfirmationCode('');
     setPaymentState(null);
     setVoteType('FREE');
-    setProvider('AIRTEL_MONEY');
+    setProvider('MPESA');
     setIncrements(10);
     onClose();
   };
@@ -309,22 +342,36 @@ export const VotingModal: React.FC<VotingModalProps> = ({
                       </div>
                     </div>
 
+                    <div className="rounded-2xl border border-emerald-500/25 bg-emerald-500/5 p-3">
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="w-2 h-2 rounded-full bg-emerald-400" />
+                        <p className="text-[10px] uppercase tracking-[0.2em] text-emerald-300 font-bold">Passerelle sécurisée</p>
+                      </div>
+                      <p className="text-[11px] text-slate-300 leading-relaxed">
+                        Paiement mobile money via une passerelle africaine professionnelle, compatible avec M-Pesa, Orange Money, Airtel Money et AfriMoney.
+                      </p>
+                    </div>
+
                     <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider">
                       Fournisseur mobile money
                     </label>
-                    <div className="grid grid-cols-3 gap-2">
-                      {['AIRTEL_MONEY', 'ORANGE_MONEY', 'MOCK'].map((option) => (
+                    <div className="grid grid-cols-2 gap-2">
+                      {paymentProviders.map((option) => (
                         <button
-                          key={option}
+                          key={option.key}
                           type="button"
-                          onClick={() => setProvider(option as 'AIRTEL_MONEY' | 'ORANGE_MONEY' | 'MOCK')}
-                          className={`rounded-xl border px-2 py-3 text-[10px] font-bold uppercase transition min-h-[46px] ${
-                            provider === option
-                              ? 'border-gold-400 bg-gold-500/10 text-gold-200'
-                              : 'border-slate-700 bg-dark-900 text-slate-300'
+                          onClick={() => setProvider(option.key as 'MPESA' | 'ORANGE_MONEY' | 'AIRTEL_MONEY' | 'AFRIMONEY' | 'MOCK')}
+                          className={`rounded-2xl border p-2.5 text-left transition-all min-h-[88px] ${
+                            provider === option.key
+                              ? 'border-gold-400 bg-gold-500/10 shadow-[0_0_0_1px_rgba(234,179,8,0.2)]'
+                              : 'border-slate-700 bg-dark-900 hover:border-slate-500 hover:bg-slate-900/80'
                           }`}
                         >
-                          {option === 'AIRTEL_MONEY' ? 'Airtel' : option === 'ORANGE_MONEY' ? 'Orange' : 'Simulé'}
+                          <div className="flex items-center gap-2 mb-2">
+                            <img src={option.logo} alt={option.label} className="w-9 h-9 object-contain rounded-lg bg-white/5 p-1" />
+                            <span className="text-[11px] font-extrabold text-white uppercase tracking-wide">{option.label}</span>
+                          </div>
+                          <p className="text-[9px] text-slate-400 leading-relaxed">{option.description}</p>
                         </button>
                       ))}
                     </div>

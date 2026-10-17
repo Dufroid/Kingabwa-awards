@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Award, Users, Vote, Trophy, ArrowRight, Sparkles, CheckCircle2, ShieldCheck, Newspaper, HeartHandshake } from 'lucide-react';
@@ -10,12 +10,65 @@ import { Category, Nominee, BlogPost, Partner, AwardEdition } from '../types/ind
 import api from '../services/api.js';
 import { useAuth } from '../context/AuthContext.js';
 
+const AnimatedCounter: React.FC<{ value: number; duration?: number; formatter?: (value: number) => string; startAt?: number; }> = ({
+  value,
+  duration = 1500,
+  formatter = (num) => num.toLocaleString('fr-FR'),
+  startAt = 0,
+}) => {
+  const [currentValue, setCurrentValue] = useState(startAt);
+  const [isVisible, setIsVisible] = useState(false);
+  const counterRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const node = counterRef.current;
+    if (!node) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const [entry] = entries;
+        if (entry?.isIntersecting) {
+          setIsVisible(true);
+        }
+      },
+      { threshold: 0.4 }
+    );
+
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!isVisible) return;
+
+    let animationFrame = 0;
+    const startTime = performance.now();
+
+    const animate = (time: number) => {
+      const progress = Math.min((time - startTime) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      const nextValue = Math.round(startAt + (value - startAt) * eased);
+      setCurrentValue(nextValue);
+
+      if (progress < 1) {
+        animationFrame = window.requestAnimationFrame(animate);
+      }
+    };
+
+    animationFrame = window.requestAnimationFrame(animate);
+    return () => window.cancelAnimationFrame(animationFrame);
+  }, [duration, isVisible, startAt, value]);
+
+  return <div ref={counterRef}>{formatter(currentValue)}</div>;
+};
+
 export const Home: React.FC = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [nominees, setNominees] = useState<Nominee[]>([]);
   const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
   const [partners, setPartners] = useState<Partner[]>([]);
   const [activeEdition, setActiveEdition] = useState<AwardEdition | null>(null);
+  const [publicStats, setPublicStats] = useState({ totalVoters: 0, totalNominees: 0, totalCategories: 0 });
   
   const [selectedNominee, setSelectedNominee] = useState<Nominee | null>(null);
   const [isVoteModalOpen, setIsVoteModalOpen] = useState(false);
@@ -25,17 +78,19 @@ export const Home: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [catRes, nomRes, blogRes, partnerRes] = await Promise.all([
+        const [catRes, nomRes, blogRes, partnerRes, publicStatsRes] = await Promise.all([
           api.get('/categories'),
           api.get('/nominees'),
           api.get('/blog/posts?limit=3'),
           api.get('/partners'),
+          api.get('/public/stats'),
         ]);
 
         if (catRes.data.success) setCategories(catRes.data.data);
         if (nomRes.data.success) setNominees(nomRes.data.data.slice(0, 4));
         if (blogRes.data.success) setBlogPosts(blogRes.data.data);
         if (partnerRes.data.success) setPartners(partnerRes.data.data);
+        if (publicStatsRes.data.success) setPublicStats(publicStatsRes.data.data);
 
         // Fetch active edition
         const edRes = await api.get('/admin/editions');
@@ -196,40 +251,28 @@ export const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* STATISTIQUES */}
-      {/* <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
-          {[
-            { icon: Award, count: categories.length || 6, label: 'Catégories d\'Awards' },
-            { icon: Users, count: nominees.length ? nominees.length * 3 : 15, label: 'Nominés d\'Élite' },
-            { icon: Vote, count: '1,420+', label: 'Votants Enregistrés' },
-            { icon: Trophy, count: '12', label: 'Lauréats Récompensés' },
-          ].map((stat, idx) => {
-            const Icon = stat.icon;
-            return (
-              <div key={idx} className="glass-card rounded-2xl p-6 text-center border border-gold-400/20 space-y-2">
-                <div className="w-10 h-10 rounded-full bg-gold-gradient/20 mx-auto flex items-center justify-center text-gold-400 mb-2">
-                  <Icon className="w-5 h-5" />
-                </div>
-                <div className="font-serif text-3xl sm:text-4xl font-extrabold text-gold-gradient">
-                  {stat.count}
-                </div>
-                <p className="text-xs uppercase tracking-wider text-slate-400 font-semibold">
-                  {stat.label}
-                </p>
-              </div>
-            );
-          })}
-        </div>
-      </section> */}
-
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
           {[
-            { icon: Award, count: 14, label: 'Catégories d\'Awards' },
-            { icon: Users, count:14, label: 'Nominés d\'Élite' },
-            { icon: Vote, count: '1,420+', label: 'Votants Enregistrés' },
-            { icon: Trophy, count: '12', label: 'Lauréats Récompensés' },
+            {
+              icon: Award,
+              value: Math.max(publicStats.totalCategories, categories.length || 0),
+              label: 'Catégories d\'Awards',
+              formatter: (value: number) => value.toString(),
+            },
+            {
+              icon: Users,
+              value: Math.max(publicStats.totalNominees, nominees.length || 0),
+              label: 'Nominés d\'Élite',
+              formatter: (value: number) => value.toString(),
+            },
+            {
+              icon: Vote,
+              value: publicStats.totalVoters,
+              label: 'Votants Enregistrés',
+              formatter: (value: number) => `${value.toLocaleString('fr-FR')}+`,
+            },
+            { icon: Trophy, value: 12, label: 'Lauréats Récompensés', formatter: (value: number) => value.toString() },
           ].map((stat, idx) => {
             const Icon = stat.icon;
             return (
@@ -238,7 +281,7 @@ export const Home: React.FC = () => {
                   <Icon className="w-5 h-5" />
                 </div>
                 <div className="font-serif text-3xl sm:text-4xl font-extrabold text-gold-gradient">
-                  {stat.count}
+                  <AnimatedCounter value={stat.value} formatter={stat.formatter} startAt={1} />
                 </div>
                 <p className="text-xs uppercase tracking-wider text-slate-400 font-semibold">
                   {stat.label}
