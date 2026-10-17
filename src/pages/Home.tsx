@@ -68,7 +68,7 @@ export const Home: React.FC = () => {
   const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
   const [partners, setPartners] = useState<Partner[]>([]);
   const [activeEdition, setActiveEdition] = useState<AwardEdition | null>(null);
-  const [publicStats, setPublicStats] = useState({ totalVoters: 0, totalNominees: 0, totalCategories: 0 });
+  const [publicStats, setPublicStats] = useState({ totalUsers: 0, totalVoters: 0, totalNominees: 0, totalCategories: 0 });
   
   const [selectedNominee, setSelectedNominee] = useState<Nominee | null>(null);
   const [isVoteModalOpen, setIsVoteModalOpen] = useState(false);
@@ -268,8 +268,8 @@ export const Home: React.FC = () => {
             },
             {
               icon: Vote,
-              value: publicStats.totalVoters,
-              label: 'Votants Enregistrés',
+              value: Math.max(publicStats.totalUsers || publicStats.totalVoters, 0),
+              label: 'Utilisateurs Inscrits',
               formatter: (value: number) => `${value.toLocaleString('fr-FR')}+`,
             },
             { icon: Trophy, value: 12, label: 'Lauréats Récompensés', formatter: (value: number) => value.toString() },
