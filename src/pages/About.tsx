@@ -91,9 +91,11 @@ export const About: React.FC = () => {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
           {[
-            { name: 'NADOR KWANZAMBI', role: 'Fondateur et Coordonnateur', image: 'https://res.cloudinary.com/xqxqwsp0/image/upload/v1792203328/NADOR.jpg' },
-            { name: 'Grace Kapinga', role: 'Directrice des Relations Publiques', image: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=400' },
-            { name: 'Patrick Lumu', role: 'Responsable du Jury & Évaluation', image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=400' },
+            { name: 'Mr.NADOR KWANZAMBI', role: 'Fondateur et Coordonnateur', image: 'https://res.cloudinary.com/xqxqwsp0/image/upload/v1792203328/NADOR.jpg' },
+            { name: 'Mr.JOSIAS MBOKOLO', role: 'Chargé de la communication', image: 'https://res.cloudinary.com/xqxqwsp0/image/upload/v1792204943/josias.jpg' },
+            { name: 'Mr.MAXIME NZANGAMA', role: 'Conseiller administratif', image: 'https://res.cloudinary.com/xqxqwsp0/image/upload/v1792205291/Maxime.jpg' },
+             { name: 'Me.ODIVIA TSHIAMA', role: 'Trésorière', image: 'https://res.cloudinary.com/xqxqwsp0/image/upload/v1792205697/ODIVIA.jpg' },
+              { name: 'Me.TABITHA MASANKA', role: 'Trésorière adjointe', image: 'https://res.cloudinary.com/xqxqwsp0/image/upload/v1792205516/TABITHA.jpg' },
           ].map((member, idx) => (
             <div key={idx} className="bg-dark-900/90 p-6 rounded-2xl border border-slate-800 text-center space-y-3">
               <img src={member.image} alt={member.name} className="w-20 h-20 rounded-full mx-auto object-cover border-2 border-gold-400" />
