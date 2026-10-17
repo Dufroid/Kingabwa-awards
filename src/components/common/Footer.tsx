@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Award, Mail, Phone, MapPin, Facebook, Instagram, Twitter, Youtube } from 'lucide-react';
+import { Mail, Phone, MapPin, Facebook, Instagram, Twitter, Youtube } from 'lucide-react';
+import { AppLogo } from './AppLogo.js';
 
 export const Footer: React.FC = () => {
   return (
@@ -11,14 +12,7 @@ export const Footer: React.FC = () => {
           
           {/* Col 1: About & Slogan */}
           <div className="space-y-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gold-gradient flex items-center justify-center shadow-gold-glow">
-                <Award className="w-5 h-5 text-dark-950 stroke-[2.5]" />
-              </div>
-              <span className="font-serif text-lg font-extrabold tracking-wider text-gold-gradient">
-                KINGABWA AWARDS
-              </span>
-            </div>
+            <AppLogo compact={true} showText={true} textClassName="text-lg" imageClassName="w-10 h-10" />
             <p className="text-gold-300 font-serif italic text-sm font-medium">
               « L'excellence de chez nous, célébrée par nous. »
             </p>

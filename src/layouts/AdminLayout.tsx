@@ -16,6 +16,7 @@ import {
   Handshake,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.js';
+import { AppLogo } from '../components/common/AppLogo.js';
 
 export const AdminLayout: React.FC = () => {
   const { user, isAdmin, logout } = useAuth();
@@ -59,15 +60,7 @@ export const AdminLayout: React.FC = () => {
       <aside className="w-64 bg-dark-900 border-r border-gold-400/20 hidden md:flex flex-col justify-between p-6">
         <div className="space-y-8">
           
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gold-gradient flex items-center justify-center shadow-gold-glow">
-              <Award className="w-5 h-5 text-dark-950 stroke-[2.5]" />
-            </div>
-            <div>
-              <span className="font-serif text-sm font-black text-gold-gradient block">ADMINISTRATION</span>
-              <span className="text-[10px] uppercase text-slate-400 font-bold block">Kingabwa Awards</span>
-            </div>
-          </div>
+          <AppLogo compact={true} showText={true} textClassName="text-xs" imageClassName="w-10 h-10" />
 
           <nav className="space-y-1.5">
             {menuItems.map((item) => {

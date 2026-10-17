@@ -182,7 +182,7 @@ export const Home: React.FC = () => {
           <div className="lg:col-span-5 relative">
             <div className="relative rounded-2xl overflow-hidden border-2 border-gold-400/40 shadow-gold-glow">
               <img
-                src={activeEdition?.image || 'https://images.unsplash.com/photo-1511578314322-379afb476865?q=80&w=800'}
+                src={activeEdition?.image || 'https://res.cloudinary.com/xqxqwsp0/image/upload/v1792203049/logo.jpg'}
                 alt={activeEdition?.name || 'Soirée de Gala'}
                 className="w-full h-80 object-cover"
               />

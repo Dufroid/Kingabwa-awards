@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Award, Lock, User, UserPlus, Smartphone } from 'lucide-react';
+import { Lock, UserPlus, Smartphone } from 'lucide-react';
 import api from '../services/api.js';
 import { useAuth } from '../context/AuthContext.js';
 import { useToast } from '../context/ToastContext.js';
+import { AppLogo } from '../components/common/AppLogo.js';
 
 export const Register: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -52,10 +53,8 @@ export const Register: React.FC = () => {
   return (
     <div className="min-h-[80vh] flex items-center justify-center px-4 py-12">
       <div className="glass-card max-w-md w-full rounded-3xl p-8 border border-gold-400/30 space-y-6 shadow-2xl">
-        <div className="text-center space-y-2">
-          <div className="w-12 h-12 rounded-2xl bg-gold-gradient mx-auto flex items-center justify-center shadow-gold-glow mb-2">
-            <Award className="w-6 h-6 text-dark-950 stroke-[2.5]" />
-          </div>
+        <div className="text-center space-y-3">
+          <AppLogo className="justify-center" compact={false} showText={false} imageClassName="w-14 h-14" />
           <h1 className="font-serif text-2xl font-black text-white uppercase">Inscription Votant</h1>
           <p className="text-xs text-slate-400">Créez votre compte gratuit pour voter aux Kingabwa Awards</p>
         </div>

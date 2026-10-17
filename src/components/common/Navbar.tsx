@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Award, Menu, X, User, LogOut, LayoutDashboard, Vote, Sparkles } from 'lucide-react';
-import { useAuth } from '../../context/AuthContext';
+import { Menu, X, User, LogOut, LayoutDashboard, Vote, Sparkles } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext.js';
+import { AppLogo } from './AppLogo.js';
 
 export const Navbar: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -34,17 +35,7 @@ export const Navbar: React.FC = () => {
           
           {/* Logo */}
           <Link to="/" className="flex items-center gap-3 group">
-            <div className="w-11 h-11 rounded-xl bg-gold-gradient flex items-center justify-center shadow-gold-glow group-hover:scale-105 transition-transform">
-              <Award className="w-6 h-6 text-dark-950 stroke-[2.5]" />
-            </div>
-            <div>
-              <span className="font-serif text-xl font-extrabold tracking-wider text-gold-gradient uppercase block">
-                KINGABWA AWARDS
-              </span>
-              <span className="text-[10px] uppercase tracking-widest text-slate-400 font-semibold block">
-                ÉDITION 2026
-              </span>
-            </div>
+            <AppLogo compact={false} className="group-hover:scale-[1.02] transition-transform" />
           </Link>
 
           {/* Desktop Navigation Links */}

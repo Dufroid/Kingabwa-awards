@@ -24,30 +24,30 @@ export const Nominees: React.FC = () => {
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [nomRes, catRes, edRes] = await Promise.all([
-          api.get('/nominees'),
-          api.get('/categories'),
-          api.get('/admin/editions'),
-        ]);
+  const fetchData = async () => {
+    try {
+      const [nomRes, catRes, edRes] = await Promise.all([
+        api.get('/nominees'),
+        api.get('/categories'),
+        api.get('/admin/editions'),
+      ]);
 
-        if (nomRes.data.success) setNominees(nomRes.data.data);
-        if (catRes.data.success) setCategories(catRes.data.data);
-        if (edRes.data.success && edRes.data.data.length > 0) {
-          const selectedEdition =
-            edRes.data.data.find((edition: AwardEdition) => edition.status === 'OPEN') ||
-            edRes.data.data[0];
-          setActiveEdition(selectedEdition || null);
-        }
-      } catch (err) {
-        console.error('Failed to load nominees', err);
-      } finally {
-        setLoading(false);
+      if (nomRes.data.success) setNominees(nomRes.data.data);
+      if (catRes.data.success) setCategories(catRes.data.data);
+      if (edRes.data.success && edRes.data.data.length > 0) {
+        const selectedEdition =
+          edRes.data.data.find((edition: AwardEdition) => edition.status === 'OPEN') ||
+          edRes.data.data[0];
+        setActiveEdition(selectedEdition || null);
       }
-    };
+    } catch (err) {
+      console.error('Failed to load nominees', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchData();
   }, []);
 
@@ -157,8 +157,9 @@ export const Nominees: React.FC = () => {
           nominee={selectedNominee}
           category={activeCategoryObj}
           editionId={activeEdition?._id || ''}
-          onVoteSuccess={() => {
-            // Refetch nominees to update vote counts if needed
+          onVoteSuccess={async () => {
+            await fetchData();
+            setIsVoteModalOpen(false);
           }}
         />
       )}

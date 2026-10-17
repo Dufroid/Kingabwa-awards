@@ -91,7 +91,7 @@ export const About: React.FC = () => {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
           {[
-            { name: 'NADOR KWANZAMBI', role: 'Fondateur et Coordonnateur', image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=400' },
+            { name: 'NADOR KWANZAMBI', role: 'Fondateur et Coordonnateur', image: 'https://res.cloudinary.com/xqxqwsp0/image/upload/v1792203328/NADOR.jpg' },
             { name: 'Grace Kapinga', role: 'Directrice des Relations Publiques', image: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=400' },
             { name: 'Patrick Lumu', role: 'Responsable du Jury & Évaluation', image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=400' },
           ].map((member, idx) => (

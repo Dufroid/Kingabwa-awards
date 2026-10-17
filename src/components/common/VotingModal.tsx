@@ -135,12 +135,12 @@ export const VotingModal: React.FC<VotingModalProps> = ({
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md overflow-y-auto">
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/80 backdrop-blur-md overflow-y-auto overscroll-contain">
         <motion.div
           initial={{ opacity: 0, scale: 0.9, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.9, y: 20 }}
-          className="glass-card w-full max-w-lg rounded-2xl p-5 sm:p-8 border border-gold-400/30 relative overflow-hidden shadow-2xl my-4 max-h-[90vh] overflow-y-auto"
+         className="glass-card w-full max-w-lg rounded-2xl p-4 sm:p-6 border border-gold-400/30 relative shadow-2xl my-2 sm:my-4 max-h-[92vh] overflow-y-auto overflow-x-hidden overscroll-contain"
         >
           <button
             onClick={handleClose}
@@ -206,7 +206,7 @@ export const VotingModal: React.FC<VotingModalProps> = ({
                   <button
                     type="button"
                     onClick={resetPaymentFlow}
-                    className="flex-1 py-3 px-4 rounded-full border border-slate-700 text-slate-300 hover:bg-white/5 font-semibold text-xs transition-colors min-h-[48px]"
+                    className="flex-1 py-3 px-4 rounded-2xl border border-slate-700 text-slate-300 hover:bg-white/5 font-semibold text-sm transition-colors min-h-[52px]"
                   >
                     Modifier
                   </button>
@@ -214,7 +214,7 @@ export const VotingModal: React.FC<VotingModalProps> = ({
                     type="button"
                     disabled={submitting || confirmationCode.length < 6}
                     onClick={handleConfirmPayment}
-                    className="flex-1 btn-gold py-3 px-4 text-xs font-extrabold uppercase tracking-wider disabled:opacity-50 min-h-[48px]"
+                    className="flex-1 btn-gold py-3 px-4 text-sm font-extrabold uppercase tracking-wider disabled:opacity-50 min-h-[52px] rounded-2xl"
                   >
                     {submitting ? 'Validation...' : 'Valider le paiement'}
                   </button>
@@ -254,7 +254,7 @@ export const VotingModal: React.FC<VotingModalProps> = ({
                     <button
                       type="button"
                       onClick={() => setVoteType('FREE')}
-                      className={`rounded-2xl border p-4 text-left transition-all min-h-[88px] ${
+                      className={`rounded-2xl border p-3.5 text-left transition-all min-h-[104px] ${
                         voteType === 'FREE'
                           ? 'border-gold-400 bg-gold-500/12 text-gold-100 shadow-[0_0_0_1px_rgba(234,179,8,0.2)]'
                           : 'border-slate-700 bg-dark-900 text-slate-300 hover:border-slate-500 hover:bg-slate-900/80'
@@ -269,7 +269,7 @@ export const VotingModal: React.FC<VotingModalProps> = ({
                     <button
                       type="button"
                       onClick={() => setVoteType('PAID')}
-                      className={`rounded-2xl border p-4 text-left transition-all min-h-[88px] ${
+                      className={`rounded-2xl border p-3.5 text-left transition-all min-h-[104px] ${
                         voteType === 'PAID'
                           ? 'border-emerald-400 bg-emerald-500/12 text-emerald-100 shadow-[0_0_0_1px_rgba(52,211,153,0.2)]'
                           : 'border-slate-700 bg-dark-900 text-slate-300 hover:border-slate-500 hover:bg-slate-900/80'
@@ -318,7 +318,7 @@ export const VotingModal: React.FC<VotingModalProps> = ({
                           key={option}
                           type="button"
                           onClick={() => setProvider(option as 'AIRTEL_MONEY' | 'ORANGE_MONEY' | 'MOCK')}
-                          className={`rounded-xl border px-2 py-2 text-[10px] font-bold uppercase transition ${
+                          className={`rounded-xl border px-2 py-3 text-[10px] font-bold uppercase transition min-h-[46px] ${
                             provider === option
                               ? 'border-gold-400 bg-gold-500/10 text-gold-200'
                               : 'border-slate-700 bg-dark-900 text-slate-300'
@@ -353,11 +353,11 @@ export const VotingModal: React.FC<VotingModalProps> = ({
                   </p>
                 </div>
 
-                <div className="flex gap-3 pt-2">
+                <div className="flex gap-3 pt-2 sticky bottom-0 bg-[#0f172a]/90 backdrop-blur-sm pb-1 -mx-1 px-1">
                   <button
                     type="button"
                     onClick={handleClose}
-                    className="flex-1 py-3 px-4 rounded-full border border-slate-700 text-slate-300 hover:bg-white/5 font-semibold text-xs transition-colors min-h-[48px]"
+                    className="flex-1 py-3 px-4 rounded-2xl border border-slate-700 text-slate-300 hover:bg-white/5 font-semibold text-sm transition-colors min-h-[52px]"
                   >
                     Annuler
                   </button>
@@ -365,9 +365,9 @@ export const VotingModal: React.FC<VotingModalProps> = ({
                     type="button"
                     disabled={submitting}
                     onClick={handleConfirmVote}
-                    className="flex-1 btn-gold py-3 px-4 text-xs font-extrabold uppercase tracking-wider disabled:opacity-50 min-h-[48px]"
+                    className="flex-1 btn-gold py-3 px-4 text-sm font-extrabold uppercase tracking-wider disabled:opacity-50 min-h-[52px] rounded-2xl"
                   >
-                    {submitting ? 'Enregistrement...' : voteType === 'FREE' ? 'Confirmer mon vote gratuit' : `Payer ${totalPrice} FC`}
+                    {submitting ? 'Enregistrement...' : voteType === 'FREE' ? 'Confirmer mon vote' : `Payer ${totalPrice} FC`}
                   </button>
                 </div>
               </div>
