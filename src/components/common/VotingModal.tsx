@@ -41,26 +41,25 @@ export const VotingModal: React.FC<VotingModalProps> = ({
     {
       key: 'MPESA',
       label: 'M-Pesa',
-      description: 'Kenia / East Africa',
-      logo: '/payment-logos/mpesa.svg',
+      
+      logo: '/payment-logos/Mpesa.jpg',
     },
     {
       key: 'ORANGE_MONEY',
       label: 'Orange Money',
-      description: 'RDC / Afrique',
-      logo: '/payment-logos/orange-money.svg',
+     
+      logo: '/payment-logos/OrangeMoney.png',
     },
     {
       key: 'AIRTEL_MONEY',
       label: 'Airtel Money',
-      description: 'RDC / Afrique',
-      logo: '/payment-logos/airtel-money.svg',
+      logo: '/payment-logos/AIRTEL_MONEY.png',
     },
     {
       key: 'AFRIMONEY',
       label: 'AfriMoney',
-      description: 'RDC / Afrique',
-      logo: '/payment-logos/afrimoney.svg',
+    
+      logo: '/payment-logos/Afrimoney.png',
     },
     {
       key: 'MOCK',
@@ -371,7 +370,6 @@ export const VotingModal: React.FC<VotingModalProps> = ({
                             <img src={option.logo} alt={option.label} className="w-9 h-9 object-contain rounded-lg bg-white/5 p-1" />
                             <span className="text-[11px] font-extrabold text-white uppercase tracking-wide">{option.label}</span>
                           </div>
-                          <p className="text-[9px] text-slate-400 leading-relaxed">{option.description}</p>
                         </button>
                       ))}
                     </div>
