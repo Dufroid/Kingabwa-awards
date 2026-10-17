@@ -224,7 +224,7 @@ export const AdminNominees: React.FC = () => {
 
       {showModal && (
         <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
-          <div className="glass-card max-w-lg w-full rounded-2xl p-6 border border-gold-400/30 space-y-4">
+          <div className="glass-card w-full max-w-lg rounded-2xl p-6 border border-gold-400/30 space-y-4 my-4 max-h-[90vh] overflow-y-auto">
             <h3 className="font-serif text-lg font-bold text-gold-gradient">
               {editingId ? 'Modifier le Nominé' : 'Ajouter un Nominé'}
             </h3>

@@ -158,8 +158,8 @@ export const AdminPartners: React.FC = () => {
       </div>
 
       {showModal && (
-        <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4 overflow-y-auto">
-          <div className="glass-card max-w-xl w-full rounded-2xl p-6 border border-gold-400/30 space-y-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md overflow-y-auto">
+          <div className="glass-card w-full max-w-xl rounded-2xl p-6 border border-gold-400/30 space-y-4 my-4 max-h-[90vh] overflow-y-auto">
             <h3 className="font-serif text-lg font-bold text-gold-gradient">{editingId ? 'Modifier le partenaire' : 'Ajouter un partenaire'}</h3>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid md:grid-cols-2 gap-4">

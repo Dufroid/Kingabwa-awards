@@ -81,10 +81,23 @@ export const BlogDetail: React.FC = () => {
         </div>
       </div>
 
-      {/* Featured Image */}
-      <div className="rounded-3xl overflow-hidden border-2 border-gold-400/30 shadow-gold-glow max-h-[450px]">
-        <img src={post.featuredImage} alt={post.title} className="w-full h-full object-cover" />
-      </div>
+      {/* Featured media */}
+      {post.mediaType === 'VIDEO' ? (
+        <div className="rounded-3xl overflow-hidden border-2 border-gold-400/30 shadow-gold-glow bg-dark-900">
+          <video src={post.featuredImage} controls className="w-full max-h-[500px] object-cover" />
+        </div>
+      ) : post.mediaType === 'PDF' ? (
+        <div className="rounded-3xl border-2 border-gold-400/30 bg-dark-900 p-6 text-center">
+          <p className="text-xs uppercase tracking-[0.2em] text-gold-300">Document PDF</p>
+          <a href={post.featuredImage} target="_blank" rel="noreferrer" className="mt-4 inline-flex items-center justify-center btn-gold px-5 py-2 text-xs uppercase font-bold">
+            Ouvrir le document
+          </a>
+        </div>
+      ) : (
+        <div className="rounded-3xl overflow-hidden border-2 border-gold-400/30 shadow-gold-glow max-h-[450px]">
+          <img src={post.featuredImage} alt={post.title} className="w-full h-full object-cover" />
+        </div>
+      )}
 
       {/* Excerpt */}
       <div className="glass-card rounded-2xl p-6 border-l-4 border-l-gold-400 text-slate-200 text-base italic font-serif leading-relaxed">

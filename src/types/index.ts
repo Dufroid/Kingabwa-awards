@@ -75,6 +75,7 @@ export interface BlogPost {
   excerpt: string;
   content: string;
   featuredImage: string;
+  mediaType?: 'IMAGE' | 'VIDEO' | 'PDF';
   authorId: {
     firstName: string;
     lastName: string;

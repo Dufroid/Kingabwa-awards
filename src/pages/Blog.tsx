@@ -72,11 +72,20 @@ export const Blog: React.FC = () => {
               className="glass-card glass-card-hover rounded-2xl overflow-hidden flex flex-col justify-between group"
             >
               <div className="relative h-56 overflow-hidden bg-dark-900">
-                <img
-                  src={post.featuredImage}
-                  alt={post.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                />
+                {post.mediaType === 'PDF' ? (
+                  <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-gold-500/20 to-slate-900 text-center text-gold-300">
+                    <div>
+                      <div className="text-3xl font-black">PDF</div>
+                      <div className="mt-2 text-[10px] uppercase tracking-[0.2em]">Document</div>
+                    </div>
+                  </div>
+                ) : (
+                  <img
+                    src={post.featuredImage}
+                    alt={post.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                )}
                 <div className="absolute inset-0 bg-gradient-to-t from-dark-950 via-transparent to-transparent" />
                 <span className="absolute top-3 left-3 bg-dark-950/80 backdrop-blur-md text-gold-300 border border-gold-400/30 text-[10px] uppercase font-bold px-3 py-1 rounded-full">
                   {typeof post.categoryId === 'object' && post.categoryId ? post.categoryId.name : 'Événement'}

@@ -125,8 +125,8 @@ export const AdminCategories: React.FC = () => {
 
       {/* Modal create */}
       {showModal && (
-        <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
-          <div className="glass-card max-w-md w-full rounded-2xl p-6 border border-gold-400/30 space-y-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md overflow-y-auto">
+          <div className="glass-card w-full max-w-md rounded-2xl p-6 border border-gold-400/30 space-y-4 my-4 max-h-[90vh] overflow-y-auto">
             <h3 className="font-serif text-lg font-bold text-gold-gradient">Créer une Catégorie</h3>
             <form onSubmit={handleCreate} className="space-y-3">
               <div>

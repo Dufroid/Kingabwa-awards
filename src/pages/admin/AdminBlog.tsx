@@ -15,6 +15,7 @@ const emptyForm = {
   excerpt: '',
   content: '',
   featuredImage: '',
+  mediaType: 'IMAGE' as 'IMAGE' | 'VIDEO' | 'PDF',
   categoryId: '',
   tags: '',
   metaTitle: '',
@@ -29,6 +30,8 @@ export const AdminBlog: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [uploadingMedia, setUploadingMedia] = useState(false);
+  const [newCategoryName, setNewCategoryName] = useState('');
   const [formData, setFormData] = useState(emptyForm);
 
   const fetchData = async () => {
@@ -57,6 +60,36 @@ export const AdminBlog: React.FC = () => {
     setFormData({ ...emptyForm, categoryId: categories[0]?._id || '' });
   };
 
+  const handleMediaUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const formDataUpload = new FormData();
+    formDataUpload.append('file', file);
+
+    try {
+      setUploadingMedia(true);
+      const res = await api.post('/blog/upload-media', formDataUpload, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+
+      if (res.data.success) {
+        const uploadedMedia = res.data.data;
+        setFormData((prev) => ({
+          ...prev,
+          featuredImage: uploadedMedia.url,
+          mediaType: uploadedMedia.mediaType || prev.mediaType,
+        }));
+        showToast('Fichier uploadé vers Cloudinary avec succès.', 'success');
+      }
+    } catch (err: any) {
+      showToast(err.response?.data?.message || 'Erreur lors du téléchargement du média.', 'error');
+    } finally {
+      setUploadingMedia(false);
+      event.target.value = '';
+    }
+  };
+
   const openCreateModal = () => {
     resetForm();
     setShowModal(true);
@@ -69,6 +102,7 @@ export const AdminBlog: React.FC = () => {
       excerpt: post.excerpt,
       content: post.content,
       featuredImage: post.featuredImage,
+      mediaType: post.mediaType || 'IMAGE',
       categoryId:
         typeof post.categoryId === 'object' && post.categoryId !== null
           ? post.categoryId._id
@@ -89,6 +123,7 @@ export const AdminBlog: React.FC = () => {
     try {
       const payload = {
         ...formData,
+        mediaType: formData.mediaType,
         tags: formData.tags
           .split(',')
           .map((tag) => tag.trim())
@@ -115,6 +150,24 @@ export const AdminBlog: React.FC = () => {
       }
     } catch (err: any) {
       showToast(err.response?.data?.message || 'Erreur lors de l’enregistrement.', 'error');
+    }
+  };
+
+  const handleCreateCategory = async () => {
+    if (!newCategoryName.trim()) {
+      showToast('Le nom de la catégorie est requis.', 'error');
+      return;
+    }
+
+    try {
+      const res = await api.post('/blog/categories', { name: newCategoryName.trim() });
+      if (res.data.success) {
+        showToast('Catégorie ajoutée.', 'success');
+        setNewCategoryName('');
+        fetchData();
+      }
+    } catch (err: any) {
+      showToast(err.response?.data?.message || 'Erreur lors de l’ajout de la catégorie.', 'error');
     }
   };
 
@@ -146,6 +199,24 @@ export const AdminBlog: React.FC = () => {
           <Plus className="w-4 h-4" />
           <span>Nouvel Article</span>
         </button>
+      </div>
+
+      <div className="glass-card rounded-2xl p-4 border border-slate-800">
+        <div className="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
+          <div>
+            <p className="text-[10px] uppercase tracking-wider text-slate-400">Types de blog</p>
+            <h2 className="font-serif text-lg font-bold text-white">Catégories du blog</h2>
+          </div>
+          <div className="flex gap-2 w-full sm:w-auto">
+            <input
+              value={newCategoryName}
+              onChange={(e) => setNewCategoryName(e.target.value)}
+              placeholder="Nouvelle catégorie"
+              className="w-full sm:w-64 bg-dark-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white"
+            />
+            <button type="button" onClick={handleCreateCategory} className="btn-gold px-4 py-2 text-[10px] font-bold uppercase">Ajouter</button>
+          </div>
+        </div>
       </div>
 
       <div className="glass-card rounded-2xl overflow-hidden border border-slate-800">
@@ -184,8 +255,8 @@ export const AdminBlog: React.FC = () => {
       </div>
 
       {showModal && (
-        <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4 overflow-y-auto">
-          <div className="glass-card max-w-3xl w-full rounded-2xl p-6 border border-gold-400/30 space-y-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md overflow-y-auto">
+          <div className="glass-card w-full max-w-3xl rounded-2xl p-6 border border-gold-400/30 space-y-4 my-4 max-h-[90vh] overflow-y-auto">
             <h3 className="font-serif text-lg font-bold text-gold-gradient">{editingId ? 'Modifier l’article' : 'Ajouter un article'}</h3>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid md:grid-cols-2 gap-4">
@@ -209,9 +280,25 @@ export const AdminBlog: React.FC = () => {
                 <textarea rows={3} required value={formData.excerpt} onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })} className="w-full bg-dark-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white" />
               </div>
 
+              <div className="grid md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1">Type de média *</label>
+                  <select value={formData.mediaType} onChange={(e) => setFormData({ ...formData, mediaType: e.target.value as 'IMAGE' | 'VIDEO' | 'PDF' })} className="w-full bg-dark-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white">
+                    <option value="IMAGE">Image</option>
+                    <option value="VIDEO">Vidéo</option>
+                    <option value="PDF">PDF</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1">Liaison Cloudinary</label>
+                  <input value={formData.featuredImage} onChange={(e) => setFormData({ ...formData, featuredImage: e.target.value })} placeholder="https://..." className="w-full bg-dark-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white" />
+                </div>
+              </div>
+
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">Image à la une *</label>
-                <input value={formData.featuredImage} onChange={(e) => setFormData({ ...formData, featuredImage: e.target.value })} required placeholder="https://..." className="w-full bg-dark-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white" />
+                <label className="block text-xs font-semibold text-slate-300 mb-1">Téléverser un fichier Cloudinary</label>
+                <input type="file" accept="image/*,video/*,.pdf" onChange={handleMediaUpload} className="block w-full text-xs text-slate-300 file:mr-4 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-gold-400 file:text-dark-950" />
+                {uploadingMedia && <p className="mt-2 text-[10px] text-amber-300">Téléchargement du média en cours...</p>}
               </div>
 
               <div>

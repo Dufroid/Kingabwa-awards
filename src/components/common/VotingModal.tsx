@@ -135,12 +135,12 @@ export const VotingModal: React.FC<VotingModalProps> = ({
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md overflow-y-auto">
         <motion.div
           initial={{ opacity: 0, scale: 0.9, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.9, y: 20 }}
-          className="glass-card max-w-lg w-full rounded-2xl p-6 sm:p-8 border border-gold-400/30 relative overflow-hidden shadow-2xl"
+          className="glass-card w-full max-w-lg rounded-2xl p-5 sm:p-8 border border-gold-400/30 relative overflow-hidden shadow-2xl my-4 max-h-[90vh] overflow-y-auto"
         >
           <button
             onClick={handleClose}
@@ -164,7 +164,7 @@ export const VotingModal: React.FC<VotingModalProps> = ({
                   </div>
                 </div>
 
-                <div className="rounded-xl border border-emerald-400/30 bg-emerald-500/10 p-4 space-y-3">
+                <div className="rounded-2xl border border-emerald-400/30 bg-emerald-500/10 p-4 space-y-3">
                   <div className="flex items-center justify-between text-xs text-emerald-100">
                     <span>Fournisseur</span>
                     <span className="font-bold">{paymentState.provider}</span>
@@ -174,14 +174,14 @@ export const VotingModal: React.FC<VotingModalProps> = ({
                     <span className="font-bold">{paymentState.phone}</span>
                   </div>
                   <div className="flex items-center justify-between text-xs text-emerald-100">
-                    <span>Incréments</span>
-                    <span className="font-bold">{increments} × 500 FC</span>
+                    <span>Montant</span>
+                    <span className="font-bold">{increments * 500} FC</span>
                   </div>
                 </div>
 
-                <div className="rounded-xl border border-slate-700 bg-dark-900 p-4">
+                <div className="rounded-2xl border border-slate-700 bg-dark-900 p-4">
                   <p className="text-[10px] uppercase tracking-wider text-slate-400">Code de confirmation simulé</p>
-                  <p className="mt-2 font-mono text-3xl font-bold tracking-[0.35rem] text-gold-300">
+                  <p className="mt-2 font-mono text-3xl font-bold tracking-[0.35rem] text-gold-300 break-all">
                     {paymentState.otpCode || '--- ---'}
                   </p>
                   <p className="mt-2 text-xs text-slate-400">
@@ -206,7 +206,7 @@ export const VotingModal: React.FC<VotingModalProps> = ({
                   <button
                     type="button"
                     onClick={resetPaymentFlow}
-                    className="flex-1 py-3 px-4 rounded-full border border-slate-700 text-slate-300 hover:bg-white/5 font-semibold text-xs transition-colors"
+                    className="flex-1 py-3 px-4 rounded-full border border-slate-700 text-slate-300 hover:bg-white/5 font-semibold text-xs transition-colors min-h-[48px]"
                   >
                     Modifier
                   </button>
@@ -214,7 +214,7 @@ export const VotingModal: React.FC<VotingModalProps> = ({
                     type="button"
                     disabled={submitting || confirmationCode.length < 6}
                     onClick={handleConfirmPayment}
-                    className="flex-1 btn-gold py-3 px-4 text-xs font-extrabold uppercase tracking-wider disabled:opacity-50"
+                    className="flex-1 btn-gold py-3 px-4 text-xs font-extrabold uppercase tracking-wider disabled:opacity-50 min-h-[48px]"
                   >
                     {submitting ? 'Validation...' : 'Valider le paiement'}
                   </button>
@@ -254,40 +254,46 @@ export const VotingModal: React.FC<VotingModalProps> = ({
                     <button
                       type="button"
                       onClick={() => setVoteType('FREE')}
-                      className={`rounded-xl border p-3 text-left transition ${
+                      className={`rounded-2xl border p-4 text-left transition-all min-h-[88px] ${
                         voteType === 'FREE'
-                          ? 'border-gold-400 bg-gold-500/10 text-gold-200'
-                          : 'border-slate-700 bg-dark-900 text-slate-300'
+                          ? 'border-gold-400 bg-gold-500/12 text-gold-100 shadow-[0_0_0_1px_rgba(234,179,8,0.2)]'
+                          : 'border-slate-700 bg-dark-900 text-slate-300 hover:border-slate-500 hover:bg-slate-900/80'
                       }`}
                     >
-                      <div className="text-xs font-bold uppercase">Vote gratuit</div>
-                      <div className="text-[10px] text-slate-400 mt-1">1 point</div>
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="text-sm font-extrabold uppercase tracking-wide">Vote gratuit</span>
+                        <span className="rounded-full bg-gold-500/15 text-gold-200 px-2 py-1 text-[10px] font-bold">+1</span>
+                      </div>
+                      <div className="text-[11px] text-slate-300 mt-2 leading-relaxed">Un vote unique par utilisateur, catégorie et édition.</div>
                     </button>
                     <button
                       type="button"
                       onClick={() => setVoteType('PAID')}
-                      className={`rounded-xl border p-3 text-left transition ${
+                      className={`rounded-2xl border p-4 text-left transition-all min-h-[88px] ${
                         voteType === 'PAID'
-                          ? 'border-emerald-400 bg-emerald-500/10 text-emerald-200'
-                          : 'border-slate-700 bg-dark-900 text-slate-300'
+                          ? 'border-emerald-400 bg-emerald-500/12 text-emerald-100 shadow-[0_0_0_1px_rgba(52,211,153,0.2)]'
+                          : 'border-slate-700 bg-dark-900 text-slate-300 hover:border-slate-500 hover:bg-slate-900/80'
                       }`}
                     >
-                      <div className="text-xs font-bold uppercase">Vote payant</div>
-                      <div className="text-[10px] text-slate-400 mt-1">1 à 10 incréments • 500 FC par incrément</div>
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="text-sm font-extrabold uppercase tracking-wide">Vote payant</span>
+                        <span className="rounded-full bg-emerald-500/15 text-emerald-200 px-2 py-1 text-[10px] font-bold">+{increments}</span>
+                      </div>
+                      <div className="text-[11px] text-slate-300 mt-2 leading-relaxed">1 à 10 incréments • 500 FC par incrément.</div>
                     </button>
                   </div>
                 </div>
 
                 {voteType === 'PAID' && (
                   <div className="space-y-3">
-                    <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 p-3 text-[11px] text-amber-100">
-                      Règle : la première transaction payante doit être de 10 incréments (5000 FC). Ensuite tu peux acheter de 1 à 10 incréments.
+                    <div className="rounded-2xl border border-amber-500/30 bg-amber-500/10 p-3 text-[11px] leading-relaxed text-amber-100">
+                      Règle importante : la première transaction payante doit être de 10 incréments (5000 FC). Ensuite, tu peux acheter entre 1 et 10 incréments.
                     </div>
 
-                    <div className="space-y-2">
+                    <div className="space-y-3 rounded-2xl border border-slate-800 bg-dark-900 p-3">
                       <div className="flex items-center justify-between text-[10px] uppercase tracking-wider text-slate-400">
-                        <span>Nombre d’incréments</span>
-                        <span>{increments} × 500 FC = {totalPrice} FC</span>
+                        <span>Incréments</span>
+                        <span className="font-bold text-gold-300">{increments} × 500 FC = {totalPrice} FC</span>
                       </div>
                       <input
                         type="range"
@@ -295,7 +301,7 @@ export const VotingModal: React.FC<VotingModalProps> = ({
                         max={10}
                         value={increments}
                         onChange={(e) => setIncrements(Number(e.target.value))}
-                        className="w-full accent-gold-400"
+                        className="w-full accent-gold-400 h-2"
                       />
                       <div className="flex justify-between text-[10px] text-slate-400">
                         <span>1</span>
@@ -332,18 +338,18 @@ export const VotingModal: React.FC<VotingModalProps> = ({
                         value={paymentPhone}
                         onChange={(e) => setPaymentPhone(e.target.value)}
                         placeholder="+243 82 000 0000"
-                        className="w-full bg-dark-900 border border-slate-800 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-gold-400"
+                        className="w-full bg-dark-900 border border-slate-800 rounded-2xl px-4 py-3 text-sm text-white focus:outline-none focus:border-gold-400"
                       />
                     </div>
                   </div>
                 )}
 
-                <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-4 flex items-start gap-3">
+                <div className="bg-amber-500/10 border border-amber-500/30 rounded-2xl p-4 flex items-start gap-3">
                   <AlertTriangle className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
                   <p className="text-xs text-amber-200 leading-relaxed">
                     {voteType === 'FREE'
                       ? 'Votre vote gratuit est limité à un par utilisateur et par catégorie. Il est comptabilisé immédiatement.'
-                      : 'Le simulateur génère un code de confirmation pour valider le paiement mobile money avant l’ajout des 10 points.'}
+                      : `Le simulateur génère un code pour valider le paiement mobile money avant l’ajout de ${increments} point(s) au candidat.`}
                   </p>
                 </div>
 
@@ -351,7 +357,7 @@ export const VotingModal: React.FC<VotingModalProps> = ({
                   <button
                     type="button"
                     onClick={handleClose}
-                    className="flex-1 py-3 px-4 rounded-full border border-slate-700 text-slate-300 hover:bg-white/5 font-semibold text-xs transition-colors"
+                    className="flex-1 py-3 px-4 rounded-full border border-slate-700 text-slate-300 hover:bg-white/5 font-semibold text-xs transition-colors min-h-[48px]"
                   >
                     Annuler
                   </button>
@@ -359,9 +365,9 @@ export const VotingModal: React.FC<VotingModalProps> = ({
                     type="button"
                     disabled={submitting}
                     onClick={handleConfirmVote}
-                    className="flex-1 btn-gold py-3 px-4 text-xs font-extrabold uppercase tracking-wider disabled:opacity-50"
+                    className="flex-1 btn-gold py-3 px-4 text-xs font-extrabold uppercase tracking-wider disabled:opacity-50 min-h-[48px]"
                   >
-                    {submitting ? 'Enregistrement...' : voteType === 'FREE' ? 'Confirmer mon vote gratuit' : 'Lancer le paiement'}
+                    {submitting ? 'Enregistrement...' : voteType === 'FREE' ? 'Confirmer mon vote gratuit' : `Payer ${totalPrice} FC`}
                   </button>
                 </div>
               </div>
