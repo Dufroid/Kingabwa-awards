@@ -26,22 +26,22 @@ export const About: React.FC = () => {
             Origine du Projet
           </h2>
           <p className="text-slate-300 text-sm leading-relaxed">
-            Kingabwa Awards est né de la volonté collective de mettre en lumière les forces vives et les réussites souvent méconnues du quartier historique de Kingabwa, situé dans la commune de Limete à Kinshasa.
+           Kingabwa Awards est né de la volonté de changer le regard porté sur Kingabwa, un quartier souvent associé à l'insécurité et à des stéréotypes négatifs. Pourtant, Kingabwa regorge d'entrepreneurs, de femmes battantes, de leaders et de talents qui contribuent chaque jour à son développement.
           </p>
           <p className="text-slate-300 text-sm leading-relaxed">
-            Depuis sa création, l'événement annuel s'est imposé comme une véritable institution socioculturelle, réunissant leaders communautaires, entrepreneurs, artistes, éducateurs, chercheurs et acteurs humanitaires au cours d'une grande soirée de célébration.
+           À travers cette initiative, nous voulons mettre en lumière ces richesses humaines, valoriser les réussites et faire de Kingabwa un symbole de mérite, d'excellence et de fierté.
           </p>
         </div>
 
         <div className="grid grid-cols-2 gap-4">
           <div className="bg-dark-900/90 p-6 rounded-2xl border border-slate-800 space-y-2">
-            <span className="font-serif text-3xl font-extrabold text-gold-gradient">2023</span>
+            <span className="font-serif text-3xl font-extrabold text-gold-gradient">2025</span>
             <p className="text-xs text-slate-300 font-semibold">1ère Édition Inaugurale</p>
             <p className="text-[11px] text-slate-500">Lancement des premiers trophées du mérite local.</p>
           </div>
           <div className="bg-dark-900/90 p-6 rounded-2xl border border-slate-800 space-y-2">
             <span className="font-serif text-3xl font-extrabold text-gold-gradient">2026</span>
-            <p className="text-xs text-slate-300 font-semibold">4ème Édition Digitale</p>
+            <p className="text-xs text-slate-300 font-semibold">2ème Édition Digitale</p>
             <p className="text-[11px] text-slate-500">Plateforme de vote web sécurisée et rayonnement international.</p>
           </div>
         </div>
@@ -55,7 +55,7 @@ export const About: React.FC = () => {
           </div>
           <h3 className="font-serif text-xl font-bold text-white">Notre Mission</h3>
           <p className="text-slate-300 text-xs leading-relaxed">
-            Identifier, valoriser et récompenser l'excellence sous toutes ses formes à Kingabwa afin de créer un sentiment d'émulation positive et d'encourager le développement local.
+           Promouvoir l'excellence, reconnaître le mérite et valoriser les talents qui contribuent positivement à la société, tout en inspirant la jeunesse et en participant à la revalorisation de l'image de Kingabwa.
           </p>
         </div>
 
@@ -65,7 +65,8 @@ export const About: React.FC = () => {
           </div>
           <h3 className="font-serif text-xl font-bold text-white">Notre Vision</h3>
           <p className="text-slate-300 text-xs leading-relaxed">
-            Faire de Kingabwa un modèle national de fierté communautaire, où chaque jeune trouve dans sa propre communauté des modèles de réussite inspirants et accessibles.
+            Faire de Kingabwa une plaque tournante culturelle, un lieu de référence où se rencontrent et se célèbrent les talents et les leaders venus de différentes communes, provinces et pays du monde.
+
           </p>
         </div>
 
@@ -90,7 +91,7 @@ export const About: React.FC = () => {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
           {[
-            { name: 'Glody Kambale', role: 'Président du Comité Général', image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=400' },
+            { name: 'NADOR KWANZAMBI', role: 'Fondateur et Coordonnateur', image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=400' },
             { name: 'Grace Kapinga', role: 'Directrice des Relations Publiques', image: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=400' },
             { name: 'Patrick Lumu', role: 'Responsable du Jury & Évaluation', image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=400' },
           ].map((member, idx) => (

@@ -26,6 +26,7 @@ export const VotingModal: React.FC<VotingModalProps> = ({
   const [success, setSuccess] = useState(false);
   const [voteType, setVoteType] = useState<'FREE' | 'PAID'>('FREE');
   const [provider, setProvider] = useState<'AIRTEL_MONEY' | 'ORANGE_MONEY' | 'MOCK'>('AIRTEL_MONEY');
+  const [increments, setIncrements] = useState(10);
   const [paymentPhone, setPaymentPhone] = useState('+243');
   const [confirmationCode, setConfirmationCode] = useState('');
   const [paymentState, setPaymentState] = useState<{
@@ -42,6 +43,8 @@ export const VotingModal: React.FC<VotingModalProps> = ({
     setPaymentState(null);
     setConfirmationCode('');
   };
+
+  const totalPrice = increments * 500;
 
   const handleConfirmVote = async () => {
     setSubmitting(true);
@@ -69,6 +72,7 @@ export const VotingModal: React.FC<VotingModalProps> = ({
         nomineeId: nominee._id,
         phone: paymentPhone,
         provider,
+        increments,
       };
 
       const res = await api.post('/payments/mobile-money/initiate', payload);
@@ -125,6 +129,7 @@ export const VotingModal: React.FC<VotingModalProps> = ({
     setPaymentState(null);
     setVoteType('FREE');
     setProvider('AIRTEL_MONEY');
+    setIncrements(10);
     onClose();
   };
 
@@ -167,6 +172,10 @@ export const VotingModal: React.FC<VotingModalProps> = ({
                   <div className="flex items-center justify-between text-xs text-emerald-100">
                     <span>Téléphone</span>
                     <span className="font-bold">{paymentState.phone}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-xs text-emerald-100">
+                    <span>Incréments</span>
+                    <span className="font-bold">{increments} × 500 FC</span>
                   </div>
                 </div>
 
@@ -264,13 +273,36 @@ export const VotingModal: React.FC<VotingModalProps> = ({
                       }`}
                     >
                       <div className="text-xs font-bold uppercase">Vote payant</div>
-                      <div className="text-[10px] text-slate-400 mt-1">10 points • paiement requis</div>
+                      <div className="text-[10px] text-slate-400 mt-1">1 à 10 incréments • 500 FC par incrément</div>
                     </button>
                   </div>
                 </div>
 
                 {voteType === 'PAID' && (
                   <div className="space-y-3">
+                    <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 p-3 text-[11px] text-amber-100">
+                      Règle : la première transaction payante doit être de 10 incréments (5000 FC). Ensuite tu peux acheter de 1 à 10 incréments.
+                    </div>
+
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between text-[10px] uppercase tracking-wider text-slate-400">
+                        <span>Nombre d’incréments</span>
+                        <span>{increments} × 500 FC = {totalPrice} FC</span>
+                      </div>
+                      <input
+                        type="range"
+                        min={1}
+                        max={10}
+                        value={increments}
+                        onChange={(e) => setIncrements(Number(e.target.value))}
+                        className="w-full accent-gold-400"
+                      />
+                      <div className="flex justify-between text-[10px] text-slate-400">
+                        <span>1</span>
+                        <span>10</span>
+                      </div>
+                    </div>
+
                     <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider">
                       Fournisseur mobile money
                     </label>
