@@ -53,7 +53,7 @@ export const VotingModal: React.FC<VotingModalProps> = ({
     {
       key: 'AIRTEL_MONEY',
       label: 'Airtel Money',
-      logo: '/payment-logos/AIRTEL_MONEY.png',
+      logo: '/payment-logos/AIRTELMONEY.png',
     },
     {
       key: 'AFRIMONEY',
