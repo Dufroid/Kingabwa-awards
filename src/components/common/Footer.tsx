@@ -1,9 +1,36 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Mail, Phone, MapPin, Facebook, Instagram, Twitter, Youtube } from 'lucide-react';
+import { Mail, Phone, MapPin, Facebook, Instagram, Twitter, Youtube, CalendarRange } from 'lucide-react';
 import { AppLogo } from './AppLogo.js';
 
+const VOTING_START_DATE = '2026-10-20T00:00:00';
+
+const getTimeLeft = (targetDate: string) => {
+  const difference = new Date(targetDate).getTime() - Date.now();
+
+  if (difference <= 0) {
+    return { days: 0, hours: 0, minutes: 0, seconds: 0 };
+  }
+
+  return {
+    days: Math.floor(difference / (1000 * 60 * 60 * 24)),
+    hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
+    minutes: Math.floor((difference / 1000 / 60) % 60),
+    seconds: Math.floor((difference / 1000) % 60),
+  };
+};
+
 export const Footer: React.FC = () => {
+  const [voteCountdown, setVoteCountdown] = useState(getTimeLeft(VOTING_START_DATE));
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setVoteCountdown(getTimeLeft(VOTING_START_DATE));
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <footer className="bg-dark-950 border-t border-gold-400/20 pt-16 pb-12 relative overflow-hidden">
       <div className="ambient-glow top-0 right-0 opacity-30" />
@@ -16,6 +43,28 @@ export const Footer: React.FC = () => {
             <p className="text-gold-300 font-serif italic text-sm font-medium">
               « L'excellence de chez nous, célébrée par nous. »
             </p>
+            <div className="rounded-2xl border border-gold-400/25 bg-gold-400/5 p-3 space-y-2">
+              <div className="flex items-center gap-2 text-gold-300 text-[10px] font-bold uppercase tracking-[0.2em]">
+                <CalendarRange className="w-3.5 h-3.5" />
+                Ouverture des votes
+              </div>
+              <div className="text-[11px] text-slate-300">
+                Du <span className="font-bold text-white">20</span> au <span className="font-bold text-white">27 Octobre</span>
+              </div>
+              <div className="grid grid-cols-4 gap-2 text-center pt-1">
+                {[
+                  { label: 'Jours', value: voteCountdown.days },
+                  { label: 'H', value: voteCountdown.hours },
+                  { label: 'M', value: voteCountdown.minutes },
+                  { label: 'S', value: voteCountdown.seconds },
+                ].map((item) => (
+                  <div key={item.label} className="rounded-xl bg-dark-900/80 border border-slate-800 px-1 py-2">
+                    <div className="text-sm font-black text-gold-gradient">{String(item.value).padStart(2, '0')}</div>
+                    <div className="text-[8px] uppercase tracking-wider text-slate-500">{item.label}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
             <p className="text-slate-400 text-xs leading-relaxed">
               Événement socioculturel annuel dédié à la célébration, la reconnaissance et la récompense des élites et talents d'exception de Kingabwa.
             </p>
