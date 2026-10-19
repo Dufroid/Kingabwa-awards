@@ -16,13 +16,25 @@ export const NomineeProfile: React.FC = () => {
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
+  const fetchNominee = async (showLoader = false) => {
+    try {
+      if (showLoader) setLoading(true);
+      const res = await api.get(`/nominees/${slug}`);
+      if (res.data.success) {
+        setNominee(res.data.data);
+      }
+    } catch (err) {
+      console.error('Failed to fetch nominee profile', err);
+    } finally {
+      if (showLoader) setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchNominee = async () => {
+    fetchNominee(true);
+
+    const fetchEdition = async () => {
       try {
-        const res = await api.get(`/nominees/${slug}`);
-        if (res.data.success) {
-          setNominee(res.data.data);
-        }
         const edRes = await api.get('/admin/editions');
         if (edRes.data.success && edRes.data.data.length > 0) {
           const selectedEdition =
@@ -31,13 +43,20 @@ export const NomineeProfile: React.FC = () => {
           setActiveEdition(selectedEdition || null);
         }
       } catch (err) {
-        console.error('Failed to fetch nominee profile', err);
-      } finally {
-        setLoading(false);
+        console.error('Failed to fetch edition', err);
       }
     };
 
-    fetchNominee();
+    fetchEdition();
+  }, [slug]);
+
+  useEffect(() => {
+    const refreshVotes = () => {
+      if (document.visibilityState !== 'visible') return;
+      fetchNominee();
+    };
+    const interval = setInterval(refreshVotes, 30_000);
+    return () => clearInterval(interval);
   }, [slug]);
 
   if (loading) {
@@ -118,7 +137,18 @@ export const NomineeProfile: React.FC = () => {
             </div>
           )}
 
-          <div className="pt-4 flex items-center gap-4">
+          <div className="pt-4 flex flex-wrap items-center gap-4">
+            {(nominee.voteCount ?? 0) > 0 && (
+              <div className="inline-flex items-center gap-3 rounded-2xl border border-gold-400/30 bg-gold-400/10 px-4 py-3">
+                <Vote className="w-5 h-5 text-gold-300" />
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Voix obtenues</p>
+                  <p className="text-xl font-black text-gold-gradient tabular-nums">
+                    {(nominee.voteCount ?? 0).toLocaleString('fr-FR')}
+                  </p>
+                </div>
+              </div>
+            )}
             <button onClick={handleVoteClick} className="btn-gold px-8 py-3.5 text-xs font-extrabold uppercase tracking-wider flex items-center gap-2">
               <Vote className="w-4 h-4" />
               <span>Voter pour {nominee.fullName.split(' ')[0]}</span>
@@ -153,6 +183,7 @@ export const NomineeProfile: React.FC = () => {
           nominee={nominee}
           category={categoryObj}
           editionId={activeEdition?._id || ''}
+          onVoteSuccess={() => fetchNominee()}
         />
       )}
 

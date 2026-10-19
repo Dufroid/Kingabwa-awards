@@ -41,7 +41,20 @@ export const NomineeCard: React.FC<NomineeCardProps> = ({ nominee, onVoteClick, 
        </div>
      </div>
 
-     <div className="p-4">
+     <div className="p-4 space-y-3">
+       {(nominee.voteCount ?? 0) > 0 && (
+         <div className="flex items-center justify-between gap-2">
+           <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+             Voix obtenues
+           </span>
+           <span className="inline-flex items-center gap-1.5 rounded-full border border-gold-400/30 bg-gold-400/10 px-2.5 py-1 text-gold-200">
+             <Vote className="w-3.5 h-3.5" />
+             <span className="text-sm font-black tabular-nums">
+               {(nominee.voteCount ?? 0).toLocaleString('fr-FR')}
+             </span>
+           </span>
+         </div>
+       )}
        <button
          onClick={() => onVoteClick(nominee)}
          className="w-full btn-gold py-2.5 px-3 text-xs uppercase font-extrabold flex items-center justify-center gap-1.5"

@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Award, Users, Vote, Trophy, ArrowRight, Sparkles, CheckCircle2, ShieldCheck, Newspaper, HeartHandshake } from 'lucide-react';
 import { CountdownTimer } from '../components/common/CountdownTimer.js';
+import { VotingCountdown } from '../components/common/VotingCountdown.js';
 import { CategoryCard } from '../components/common/CategoryCard.js';
 import { NomineeCard } from '../components/common/NomineeCard.js';
 import { VotingModal } from '../components/common/VotingModal.js';
@@ -75,38 +76,53 @@ export const Home: React.FC = () => {
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
+  const fetchData = async () => {
+    try {
+      const [catRes, nomRes, blogRes, partnerRes, publicStatsRes] = await Promise.all([
+        api.get('/categories'),
+        api.get('/nominees'),
+        api.get('/blog/posts?limit=3'),
+        api.get('/partners'),
+        api.get('/public/stats'),
+      ]);
+
+      if (catRes.data.success) setCategories(catRes.data.data);
+      if (nomRes.data.success) setNominees(nomRes.data.data.slice(0, 4));
+      if (blogRes.data.success) setBlogPosts(blogRes.data.data);
+      if (partnerRes.data.success) setPartners(partnerRes.data.data);
+      if (publicStatsRes.data.success) setPublicStats(publicStatsRes.data.data);
+
+      // Fetch active edition
+      const edRes = await api.get('/admin/editions');
+
+      if (edRes.data.success && edRes.data.data.length > 0) {
+        const selectedEdition =
+          edRes.data.data.find((edition: AwardEdition) => edition.status === 'OPEN') ||
+          edRes.data.data[0];
+        setActiveEdition(selectedEdition || null);
+      }
+    } catch (err) {
+      console.error('Error fetching home data', err);
+    }
+  };
+
   useEffect(() => {
-    const fetchData = async () => {
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    const refreshCounts = async () => {
+      if (document.visibilityState !== 'visible') return;
       try {
-        const [catRes, nomRes, blogRes, partnerRes, publicStatsRes] = await Promise.all([
-          api.get('/categories'),
-          api.get('/nominees'),
-          api.get('/blog/posts?limit=3'),
-          api.get('/partners'),
-          api.get('/public/stats'),
-        ]);
-
-        if (catRes.data.success) setCategories(catRes.data.data);
-        if (nomRes.data.success) setNominees(nomRes.data.data.slice(0, 4));
-        if (blogRes.data.success) setBlogPosts(blogRes.data.data);
-        if (partnerRes.data.success) setPartners(partnerRes.data.data);
-        if (publicStatsRes.data.success) setPublicStats(publicStatsRes.data.data);
-
-        // Fetch active edition
-        const edRes = await api.get('/admin/editions');
-
-        if (edRes.data.success && edRes.data.data.length > 0) {
-          const selectedEdition =
-            edRes.data.data.find((edition: AwardEdition) => edition.status === 'OPEN') ||
-            edRes.data.data[0];
-          setActiveEdition(selectedEdition || null);
-        }
-      } catch (err) {
-        console.error('Error fetching home data', err);
+        const res = await api.get('/nominees');
+        if (res.data.success) setNominees(res.data.data.slice(0, 4));
+      } catch {
+        // silent refresh: the next tick will retry
       }
     };
 
-    fetchData();
+    const interval = setInterval(refreshCounts, 30_000);
+    return () => clearInterval(interval);
   }, []);
 
   const handleVoteClick = (nominee: Nominee) => {
@@ -123,6 +139,10 @@ export const Home: React.FC = () => {
       ? selectedNominee.categoryId
       : categories.find((c) => c._id === selectedNominee.categoryId) || null
     : null;
+
+  const galaDateLabel = activeEdition?.ceremonyDate
+    ? new Intl.DateTimeFormat('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' }).format(new Date(activeEdition.ceremonyDate))
+    : '04 Novembre 2026';
 
   return (
     <div className="space-y-24 pb-20 overflow-hidden">
@@ -167,17 +187,27 @@ export const Home: React.FC = () => {
             La plus haute distinction socioculturelle dédiée à la reconnaissance et la récompense des élites, personnalités et talents d'exception de Kingabwa.
           </motion.p>
 
-          {/* Countdown Widget */}
+          {/* Countdown Widgets */}
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.6, delay: 0.3 }}
             className="pt-4"
           >
-            <p className="text-xs font-bold text-gold-400 uppercase tracking-widest mb-2">
-              Grande Soirée de Gala dans :
-            </p>
-            <CountdownTimer targetDate={activeEdition?.ceremonyDate || '2026-11-04T20:00:00'} />
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-10 items-start">
+              <div>
+                <p className="text-xs font-bold text-gold-400 uppercase tracking-widest">
+                  Grande Soirée de Gala
+                </p>
+                <p className="text-[11px] sm:text-xs text-slate-400 font-semibold mt-2">
+                  {galaDateLabel}
+                </p>
+                <CountdownTimer targetDate={activeEdition?.ceremonyDate || '2026-11-04T20:00:00'} />
+              </div>
+              <div className="lg:border-l lg:border-gold-400/20 lg:pl-10 pt-4 lg:pt-0 border-t lg:border-t-0 border-gold-400/10">
+                <VotingCountdown />
+              </div>
+            </div>
           </motion.div>
 
           {/* CTA Buttons */}
@@ -442,7 +472,7 @@ export const Home: React.FC = () => {
           category={selectedCategory}
           editionId={activeEdition?._id || ''}
           onVoteSuccess={() => {
-            // refresh data if needed
+            fetchData();
           }}
         />
       )}

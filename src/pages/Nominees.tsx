@@ -51,6 +51,21 @@ export const Nominees: React.FC = () => {
     fetchData();
   }, []);
 
+  useEffect(() => {
+    const refreshCounts = async () => {
+      if (document.visibilityState !== 'visible') return;
+      try {
+        const res = await api.get('/nominees');
+        if (res.data.success) setNominees(res.data.data);
+      } catch {
+        // silent refresh: the next tick will retry
+      }
+    };
+
+    const interval = setInterval(refreshCounts, 30_000);
+    return () => clearInterval(interval);
+  }, []);
+
   const handleVoteClick = (nominee: Nominee) => {
     if (!isAuthenticated) {
       navigate('/login');
@@ -157,9 +172,9 @@ export const Nominees: React.FC = () => {
           nominee={selectedNominee}
           category={activeCategoryObj}
           editionId={activeEdition?._id || ''}
-          onVoteSuccess={async () => {
+          onVoteSuccess={async (voteType) => {
             await fetchData();
-            setIsVoteModalOpen(false);
+            if (voteType === 'FREE') setIsVoteModalOpen(false);
           }}
         />
       )}
