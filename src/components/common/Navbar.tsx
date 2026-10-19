@@ -173,7 +173,7 @@ export const Navbar: React.FC = () => {
                   }}
                   className="text-left px-4 py-2 text-sm text-red-400 font-medium"
                 >
-                  Se déconnecter ({user?.email || user?.phone || 'Compte'})
+                  Se déconnecter ({user?.phone || 'Compte'})
                 </button>
               </>
             ) : (

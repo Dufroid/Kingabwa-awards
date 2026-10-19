@@ -17,7 +17,6 @@ interface TransactionItem {
     _id: string;
     fullName: string;
     phone?: string;
-    email?: string;
     role?: string;
   } | null;
   vote?: {
@@ -172,7 +171,7 @@ export const AdminTransactions: React.FC = () => {
                       <td className="py-4 pr-4 font-mono text-[11px] text-gold-300">{tx.reference}</td>
                       <td className="py-4 pr-4">
                         <div className="font-semibold text-white">{tx.user?.fullName || 'Utilisateur inconnu'}</div>
-                        <div className="text-[10px] text-slate-400">{tx.user?.email || tx.user?.phone || '—'}</div>
+                        <div className="text-[10px] text-slate-400">{tx.user?.phone || '—'}</div>
                       </td>
                       <td className="py-4 pr-4">{tx.provider}</td>
                       <td className="py-4 pr-4">{tx.phone}</td>

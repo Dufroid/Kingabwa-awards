@@ -50,7 +50,7 @@ export const AdminUsers: React.FC = () => {
           <thead className="bg-dark-900 text-gold-400 font-serif uppercase tracking-wider border-b border-slate-800">
             <tr>
               <th className="p-4">Utilisateur</th>
-              <th className="p-4">E-mail</th>
+              <th className="p-4">Téléphone</th>
               <th className="p-4">Rôle Actuel</th>
               <th className="p-4 text-right">Changer le Rôle</th>
             </tr>
@@ -61,7 +61,7 @@ export const AdminUsers: React.FC = () => {
                 <td className="p-4 font-bold text-white">
                   {u.firstName} {u.lastName}
                 </td>
-                <td className="p-4 text-slate-400">{u.email}</td>
+                <td className="p-4 text-slate-400">{u.phone || '—'}</td>
                 <td className="p-4">
                   <span className={`px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase ${
                     u.role === 'SUPER_ADMIN'

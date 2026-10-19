@@ -7,7 +7,7 @@ import { useToast } from '../context/ToastContext.js';
 import { AppLogo } from '../components/common/AppLogo.js';
 
 export const Login: React.FC = () => {
-  const [identifier, setIdentifier] = useState('');
+  const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
@@ -19,7 +19,7 @@ export const Login: React.FC = () => {
     e.preventDefault();
     setSubmitting(true);
     try {
-      const res = await api.post('/auth/login', { identifier, password });
+      const res = await api.post('/auth/login', { phone, password });
       if (res.data.success) {
         login(res.data.token, res.data.refreshToken, res.data.user);
         showToast('Bienvenue ! Connexion réussie.', 'success');
@@ -53,8 +53,8 @@ export const Login: React.FC = () => {
               <input
                 type="text"
                 required
-                value={identifier}
-                onChange={(e) => setIdentifier(e.target.value)}
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
                 placeholder="+243 82 000 0000"
                 className="w-full bg-dark-900 border border-slate-800 rounded-xl px-4 py-3 pl-10 text-xs text-white focus:outline-none focus:border-gold-400"
               />
@@ -95,7 +95,7 @@ export const Login: React.FC = () => {
           <div className="flex gap-2">
             <button
               onClick={() => {
-                setIdentifier('+243000000000');
+                setPhone('+243000000000');
                 setPassword('Admin@2026');
               }}
               className="flex-1 py-1.5 bg-dark-800 text-[10px] text-slate-300 rounded border border-slate-700 hover:border-gold-400"
@@ -104,7 +104,7 @@ export const Login: React.FC = () => {
             </button>
             <button
               onClick={() => {
-                setIdentifier('+243000000001');
+                setPhone('+243000000001');
                 setPassword('Voter@2026');
               }}
               className="flex-1 py-1.5 bg-dark-800 text-[10px] text-slate-300 rounded border border-slate-700 hover:border-gold-400"
