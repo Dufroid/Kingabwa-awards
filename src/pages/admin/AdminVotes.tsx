@@ -11,8 +11,8 @@ export const AdminVotes: React.FC = () => {
       try {
         const res = await api.get('/votes/statistics');
         if (res.data.success) {
-          console.log(res.data)
-          setStats(res.data);
+        
+             setStats(res.data);
         }
       } catch (err) {
         console.error('Failed to load vote statistics', err);
