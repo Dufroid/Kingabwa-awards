@@ -1,9 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, CheckCircle2, AlertTriangle, ShieldCheck, Copy, Check } from 'lucide-react';
 import { Nominee, Category } from '../../types/index.js';
 import api from '../../services/api.js';
 import { useToast } from '../../context/ToastContext.js';
+import { useVotingPhase } from '../../hooks/useVotingPhase.js';
+import { getVotingAvailabilityMessage } from '../../config/votingPeriod.js';
 
 interface VotingModalProps {
   isOpen: boolean;
@@ -79,7 +81,26 @@ export const VotingModal: React.FC<VotingModalProps> = ({
   const [contextLoading, setContextLoading] = useState(false);
   const [paymentState, setPaymentState] = useState<InitiatedPayment | null>(null);
   const [copiedField, setCopiedField] = useState<'phone' | null>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
   const { showToast } = useToast();
+  const votingPhase = useVotingPhase();
+  const votingOpen = votingPhase === 'OPEN';
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const opener = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    document.body.style.overflow = 'hidden';
+    const timer = window.setTimeout(() => {
+      if (dialogRef.current) dialogRef.current.scrollTop = 0;
+      closeButtonRef.current?.focus();
+    }, 50);
+    return () => {
+      window.clearTimeout(timer);
+      document.body.style.overflow = '';
+      if (opener && opener.isConnected) opener.focus();
+    };
+  }, [isOpen]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -151,6 +172,11 @@ export const VotingModal: React.FC<VotingModalProps> = ({
   };
 
   const handleConfirmVote = async () => {
+    if (!votingOpen) {
+      showToast(getVotingAvailabilityMessage(votingPhase), 'error');
+      return;
+    }
+
     if (voteType === 'FREE') {
       setSubmitting(true);
       try {
@@ -221,12 +247,17 @@ export const VotingModal: React.FC<VotingModalProps> = ({
     <AnimatePresence>
       <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/80 backdrop-blur-md overflow-y-auto overscroll-contain">
         <motion.div
+          ref={dialogRef}
+          role="dialog"
+          aria-modal="true"
+          aria-label={`Confirmation de vote pour ${nominee.fullName}`}
           initial={{ opacity: 0, scale: 0.9, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.9, y: 20 }}
           className="glass-card w-full max-w-lg rounded-2xl p-4 sm:p-6 border border-gold-400/30 relative shadow-2xl my-2 sm:my-4 max-h-[92vh] overflow-y-auto overflow-x-hidden overscroll-contain"
         >
           <button
+            ref={closeButtonRef}
             onClick={handleClose}
             className="absolute top-4 right-4 p-2 text-slate-400 hover:text-white rounded-full hover:bg-white/10"
           >
@@ -298,6 +329,15 @@ export const VotingModal: React.FC<VotingModalProps> = ({
                   <p className="text-xs text-gold-400 font-semibold">{category.name}</p>
                 </div>
               </div>
+
+              {!votingOpen && (
+                <div className="rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4 flex items-start gap-3">
+                  <AlertTriangle className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
+                  <p className="text-xs text-amber-200 leading-relaxed">
+                    {getVotingAvailabilityMessage(votingPhase)}
+                  </p>
+                </div>
+              )}
 
               <div className="space-y-3">
                 <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider">
@@ -464,6 +504,7 @@ export const VotingModal: React.FC<VotingModalProps> = ({
                   type="button"
                   disabled={
                     submitting ||
+                    !votingOpen ||
                     (voteType === 'PAID' && (contextLoading || hasPendingPayment || !merchantPhone))
                   }
                   onClick={handleConfirmVote}

@@ -5,6 +5,8 @@ import { Nominee, Category, AwardEdition } from '../types/index.js';
 import api from '../services/api.js';
 import { useAuth } from '../context/AuthContext.js';
 import { VotingModal } from '../components/common/VotingModal.js';
+import { useVotingPhase } from '../hooks/useVotingPhase.js';
+import { getVotingAvailabilityMessage } from '../config/votingPeriod.js';
 
 export const NomineeProfile: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -12,6 +14,8 @@ export const NomineeProfile: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [isVoteModalOpen, setIsVoteModalOpen] = useState(false);
   const [activeEdition, setActiveEdition] = useState<AwardEdition | null>(null);
+  const votingPhase = useVotingPhase();
+  const votingOpen = votingPhase === 'OPEN';
 
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
@@ -149,7 +153,16 @@ export const NomineeProfile: React.FC = () => {
                 </div>
               </div>
             )}
-            <button onClick={handleVoteClick} className="btn-gold px-8 py-3.5 text-xs font-extrabold uppercase tracking-wider flex items-center gap-2">
+            <button
+              onClick={handleVoteClick}
+              disabled={!votingOpen}
+              title={votingOpen ? undefined : getVotingAvailabilityMessage(votingPhase)}
+              className={`px-8 py-3.5 text-xs font-extrabold uppercase tracking-wider flex items-center gap-2 ${
+                votingOpen
+                  ? 'btn-gold'
+                  : 'rounded-xl border border-slate-700 text-slate-500 cursor-not-allowed'
+              }`}
+            >
               <Vote className="w-4 h-4" />
               <span>Voter pour {nominee.fullName.split(' ')[0]}</span>
             </button>

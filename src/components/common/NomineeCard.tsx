@@ -2,6 +2,8 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Vote, Eye, CheckCircle2 } from 'lucide-react';
 import { Nominee, Category } from '../../types/index.js';
+import { useVotingPhase } from '../../hooks/useVotingPhase.js';
+import { getVotingAvailabilityMessage } from '../../config/votingPeriod.js';
 
 interface NomineeCardProps {
   nominee: Nominee;
@@ -11,6 +13,8 @@ interface NomineeCardProps {
 
 export const NomineeCard: React.FC<NomineeCardProps> = ({ nominee, onVoteClick, hasVoted }) => {
   const categoryName = typeof nominee.categoryId === 'object' ? nominee.categoryId.name : '';
+  const votingPhase = useVotingPhase();
+  const votingOpen = votingPhase === 'OPEN';
 
  return (
    <div className="glass-card glass-card-hover rounded-2xl overflow-hidden flex flex-col justify-between group">
@@ -57,7 +61,13 @@ export const NomineeCard: React.FC<NomineeCardProps> = ({ nominee, onVoteClick, 
        )}
        <button
          onClick={() => onVoteClick(nominee)}
-         className="w-full btn-gold py-2.5 px-3 text-xs uppercase font-extrabold flex items-center justify-center gap-1.5"
+         disabled={!votingOpen}
+         title={votingOpen ? undefined : getVotingAvailabilityMessage(votingPhase)}
+         className={`w-full py-2.5 px-3 text-xs uppercase font-extrabold flex items-center justify-center gap-1.5 ${
+           votingOpen
+             ? 'btn-gold'
+             : 'rounded-xl border border-slate-700 text-slate-500 cursor-not-allowed'
+         }`}
        >
          <Vote className="w-3.5 h-3.5" />
          Voter
