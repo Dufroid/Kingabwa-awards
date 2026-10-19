@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, CheckCircle2, AlertTriangle, ShieldCheck, Copy, Check, Smartphone } from 'lucide-react';
+import { X, CheckCircle2, AlertTriangle, ShieldCheck, Copy, Check } from 'lucide-react';
 import { Nominee, Category } from '../../types/index.js';
 import api from '../../services/api.js';
 import { useToast } from '../../context/ToastContext.js';
-import { useAuth } from '../../context/AuthContext.js';
 
 interface VotingModalProps {
   isOpen: boolean;
@@ -41,11 +40,9 @@ interface PaidVoteContext {
   pricePerIncrement: number;
   currency: string;
   hasPendingPayment: boolean;
-  pendingReference: string | null;
 }
 
 interface InitiatedPayment {
-  reference: string;
   provider: PaidProvider;
   providerLabel: string;
   operator: string;
@@ -77,21 +74,12 @@ export const VotingModal: React.FC<VotingModalProps> = ({
   const [voteType, setVoteType] = useState<'FREE' | 'PAID'>('FREE');
   const [provider, setProvider] = useState<PaidProvider>('MPESA');
   const [increments, setIncrements] = useState(10);
-  const [paymentPhone, setPaymentPhone] = useState('+243');
-  const [transactionId, setTransactionId] = useState('');
   const [methods, setMethods] = useState<PaymentMethods | null>(null);
   const [context, setContext] = useState<PaidVoteContext | null>(null);
   const [contextLoading, setContextLoading] = useState(false);
   const [paymentState, setPaymentState] = useState<InitiatedPayment | null>(null);
-  const [copiedField, setCopiedField] = useState<'phone' | 'reference' | null>(null);
+  const [copiedField, setCopiedField] = useState<'phone' | null>(null);
   const { showToast } = useToast();
-  const { user } = useAuth();
-
-  useEffect(() => {
-    if (user?.phone) {
-      setPaymentPhone(user.phone);
-    }
-  }, [user?.phone]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -152,7 +140,7 @@ export const VotingModal: React.FC<VotingModalProps> = ({
   const lockedIncrements = context?.lockedIncrements ?? null;
   const hasPendingPayment = Boolean(context?.hasPendingPayment);
 
-  const copyValue = async (value: string, field: 'phone' | 'reference') => {
+  const copyValue = async (value: string, field: 'phone') => {
     try {
       await navigator.clipboard.writeText(value);
       setCopiedField(field);
@@ -193,11 +181,6 @@ export const VotingModal: React.FC<VotingModalProps> = ({
       return;
     }
 
-    if (paymentPhone.trim().length < 8) {
-      showToast('Renseignez le numéro de téléphone utilisé pour le paiement.', 'error');
-      return;
-    }
-
     setSubmitting(true);
     try {
       const res = await api.post('/payments/mobile-money/initiate', {
@@ -210,7 +193,9 @@ export const VotingModal: React.FC<VotingModalProps> = ({
 
       if (res.data.success) {
         setPaymentState(res.data.payment);
-        showToast('Référence générée. Effectuez le transfert puis déclarez votre transaction.', 'success');
+        setSuccessMessage(res.data.message || 'Paiement enregistré. Votre vote sera validé après vérification par l’administrateur.');
+        setSuccess(true);
+        showToast('Paiement enregistré. En attente de validation par l’administrateur.', 'success');
       }
     } catch (err: any) {
       const msg = err.response?.data?.message || 'La demande de paiement n\'a pas pu être créée.';
@@ -220,45 +205,9 @@ export const VotingModal: React.FC<VotingModalProps> = ({
     }
   };
 
-  const handleDeclarePayment = async () => {
-    if (!paymentState) return;
-
-    if (paymentPhone.trim().length < 8) {
-      showToast('Renseignez le numéro de téléphone utilisé pour le paiement.', 'error');
-      return;
-    }
-
-    if (transactionId.trim().length < 4) {
-      showToast('Saisissez l\'identifiant de transaction reçu par SMS.', 'error');
-      return;
-    }
-
-    setSubmitting(true);
-    try {
-      const res = await api.post('/payments/mobile-money/declare', {
-        reference: paymentState.reference,
-        payerPhone: paymentPhone.trim(),
-        transactionId: transactionId.trim(),
-      });
-
-      if (res.data.success) {
-        setSuccessMessage(res.data.message || 'Paiement déclaré. Votre vote sera comptabilisé après validation par l\'administrateur.');
-        setSuccess(true);
-        showToast('Paiement déclaré avec succès', 'success');
-        if (onVoteSuccess) onVoteSuccess('PAID');
-      }
-    } catch (err: any) {
-      const msg = err.response?.data?.message || 'La déclaration du paiement a échoué.';
-      showToast(msg, 'error');
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
   const handleClose = () => {
     setSuccess(false);
     setSuccessMessage('');
-    setTransactionId('');
     setPaymentState(null);
     setVoteType('FREE');
     setProvider('MPESA');
@@ -290,7 +239,7 @@ export const VotingModal: React.FC<VotingModalProps> = ({
                 <CheckCircle2 className="w-8 h-8 text-dark-950 stroke-[2.5]" />
               </div>
               <h3 className="font-serif text-2xl font-extrabold text-gold-gradient">
-                {voteType === 'PAID' ? 'Paiement déclaré !' : 'Merci pour votre Vote !'}
+                {voteType === 'PAID' ? 'Paiement enregistré !' : 'Merci pour votre Vote !'}
               </h3>
               <p className="text-sm text-slate-300 leading-relaxed max-w-sm mx-auto">
                 {voteType === 'PAID'
@@ -299,9 +248,13 @@ export const VotingModal: React.FC<VotingModalProps> = ({
               </p>
               {voteType === 'PAID' && paymentState && (
                 <div className="rounded-2xl border border-slate-700 bg-dark-900 p-4 text-left space-y-2">
+                  <div className="flex items-center justify-between gap-3 text-xs text-slate-300">
+                    <span>Numéro de réception</span>
+                    <span className="font-mono font-bold text-gold-300 break-all text-right">{paymentState.merchantPhone}</span>
+                  </div>
                   <div className="flex items-center justify-between text-xs text-slate-300">
-                    <span>Référence</span>
-                    <span className="font-mono font-bold text-gold-300">{paymentState.reference}</span>
+                    <span>Opérateur</span>
+                    <span className="font-bold text-white">{paymentState.providerLabel} — {paymentState.operator}</span>
                   </div>
                   <div className="flex items-center justify-between text-xs text-slate-300">
                     <span>Voix demandées</span>
@@ -319,119 +272,6 @@ export const VotingModal: React.FC<VotingModalProps> = ({
               >
                 Continuer
               </button>
-            </div>
-          ) : paymentState ? (
-            <div className="space-y-5">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-xl bg-emerald-500/15 flex items-center justify-center border border-emerald-400/40">
-                  <ShieldCheck className="w-6 h-6 text-emerald-300 stroke-[2.5]" />
-                </div>
-                <div>
-                  <h3 className="font-serif text-lg font-bold text-gold-gradient">
-                    Effectuez le paiement
-                  </h3>
-                  <p className="text-xs text-slate-400">Puis déclarez votre transaction</p>
-                </div>
-              </div>
-
-              <div className="rounded-2xl border border-emerald-400/30 bg-emerald-500/10 p-4 space-y-3">
-                <div className="flex items-center justify-between text-xs text-emerald-100">
-                  <span>Montant à envoyer</span>
-                  <span className="font-bold text-lg text-white">{paymentState.amount} {paymentState.currency}</span>
-                </div>
-                <div className="flex items-center justify-between text-xs text-emerald-100">
-                  <span>Opérateur</span>
-                  <span className="font-bold">{paymentState.providerLabel} — {paymentState.operator}</span>
-                </div>
-                <div className="flex items-center justify-between text-xs text-emerald-100">
-                  <span>Voix</span>
-                  <span className="font-bold">{paymentState.increments}</span>
-                </div>
-              </div>
-
-              <div className="rounded-2xl border border-slate-700 bg-dark-900 p-4 space-y-3">
-                <div>
-                  <p className="text-[10px] uppercase tracking-wider text-slate-400">Numéro de réception</p>
-                  <div className="flex items-center justify-between gap-2 mt-1">
-                    <p className="font-mono text-xl font-bold tracking-wide text-white break-all">{paymentState.merchantPhone}</p>
-                    <button
-                      type="button"
-                      onClick={() => copyValue(paymentState.merchantPhone, 'phone')}
-                      className="p-2 rounded-lg border border-slate-700 text-slate-300 hover:text-white hover:border-gold-400"
-                      title="Copier le numéro"
-                    >
-                      {copiedField === 'phone' ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
-                    </button>
-                  </div>
-                </div>
-                <div>
-                  <p className="text-[10px] uppercase tracking-wider text-slate-400">Référence à indiquer dans le motif</p>
-                  <div className="flex items-center justify-between gap-2 mt-1">
-                    <p className="font-mono text-base font-bold text-gold-300 break-all">{paymentState.reference}</p>
-                    <button
-                      type="button"
-                      onClick={() => copyValue(paymentState.reference, 'reference')}
-                      className="p-2 rounded-lg border border-slate-700 text-slate-300 hover:text-white hover:border-gold-400"
-                      title="Copier la référence"
-                    >
-                      {copiedField === 'reference' ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              <ol className="list-decimal list-inside space-y-1.5 text-[11px] text-slate-300 leading-relaxed">
-                <li>Envoyez {paymentState.amount} {paymentState.currency} au numéro ci-dessus.</li>
-                <li>Indiquez la référence <span className="font-mono text-gold-300">{paymentState.reference}</span> dans le motif.</li>
-                <li>Saisissez ci-dessous l'ID de transaction reçu par SMS, puis validez.</li>
-              </ol>
-
-              <div className="space-y-2">
-                <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider">
-                  Numéro utilisé pour le paiement
-                </label>
-                <div className="relative">
-                  <input
-                    type="tel"
-                    value={paymentPhone}
-                    onChange={(e) => setPaymentPhone(e.target.value)}
-                    placeholder="+243 82 000 0000"
-                    className="w-full bg-dark-900 border border-slate-800 rounded-xl px-4 py-3 pl-10 text-sm text-white focus:outline-none focus:border-gold-400"
-                  />
-                  <Smartphone className="w-4 h-4 text-slate-400 absolute left-3 top-3.5" />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider">
-                  ID de transaction reçu par SMS *
-                </label>
-                <input
-                  type="text"
-                  value={transactionId}
-                  onChange={(e) => setTransactionId(e.target.value)}
-                  placeholder="Ex : MP240719.1234.A56789"
-                  className="w-full bg-dark-900 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-gold-400"
-                />
-              </div>
-
-              <div className="flex gap-3 pt-1">
-                <button
-                  type="button"
-                  onClick={handleClose}
-                  className="flex-1 py-3 px-4 rounded-2xl border border-slate-700 text-slate-300 hover:bg-white/5 font-semibold text-sm transition-colors min-h-[52px]"
-                >
-                  Fermer
-                </button>
-                <button
-                  type="button"
-                  disabled={submitting || transactionId.trim().length < 4}
-                  onClick={handleDeclarePayment}
-                  className="flex-1 btn-gold py-3 px-4 text-sm font-extrabold uppercase tracking-wider disabled:opacity-50 min-h-[52px] rounded-2xl"
-                >
-                  {submitting ? 'Envoi...' : "J'ai effectué le paiement"}
-                </button>
-              </div>
             </div>
           ) : (
             <div className="space-y-6">
@@ -505,8 +345,7 @@ export const VotingModal: React.FC<VotingModalProps> = ({
                     </div>
                   ) : hasPendingPayment ? (
                     <div className="rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4 text-[11px] leading-relaxed text-amber-100">
-                      Vous avez déjà un paiement en attente de validation pour ce candidat
-                      {context?.pendingReference ? ` (référence ${context.pendingReference})` : ''}.
+                      Vous avez déjà un paiement en attente de validation pour ce candidat.
                       Patientez jusqu'à la validation par l'administrateur.
                     </div>
                   ) : (
@@ -563,7 +402,7 @@ export const VotingModal: React.FC<VotingModalProps> = ({
                           )}
                         </div>
                         <p className="text-[11px] text-emerald-100 leading-relaxed">
-                          Effectuez le transfert depuis votre téléphone, puis générez la référence de paiement à indiquer dans le motif.
+                          Envoyez le montant au numéro affiché depuis le numéro lié à votre compte, puis cliquez sur « J'ai effectué le paiement ». L'administrateur vérifiera la réception du SMS de l'opérateur avant de valider vos voix.
                         </p>
                         {!merchantPhone && (
                           <p className="text-[11px] text-red-200">
@@ -598,22 +437,6 @@ export const VotingModal: React.FC<VotingModalProps> = ({
                             </div>
                           </>
                         )}
-                      </div>
-
-                      <div className="space-y-2">
-                        <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider">
-                          Numéro utilisé pour le paiement
-                        </label>
-                        <div className="relative">
-                          <input
-                            type="tel"
-                            value={paymentPhone}
-                            onChange={(e) => setPaymentPhone(e.target.value)}
-                            placeholder="+243 82 000 0000"
-                            className="w-full bg-dark-900 border border-slate-800 rounded-xl px-4 py-3 pl-10 text-sm text-white focus:outline-none focus:border-gold-400"
-                          />
-                          <Smartphone className="w-4 h-4 text-slate-400 absolute left-3 top-3.5" />
-                        </div>
                       </div>
                     </>
                   )}
@@ -650,7 +473,7 @@ export const VotingModal: React.FC<VotingModalProps> = ({
                     ? 'Traitement...'
                     : voteType === 'FREE'
                       ? 'Confirmer mon vote'
-                      : 'Générer ma référence'}
+                      : "J'ai effectué le paiement"}
                 </button>
               </div>
             </div>

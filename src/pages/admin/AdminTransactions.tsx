@@ -5,7 +5,6 @@ import { useToast } from '../../context/ToastContext.js';
 
 interface TransactionItem {
   _id: string;
-  reference: string;
   provider: string;
   amount: number;
   currency: string;
@@ -29,9 +28,7 @@ interface TransactionItem {
     nomineeName?: string | null;
     categoryName?: string | null;
     editionName?: string | null;
-    paymentReference?: string;
-  } | null;
-  metadata?: Record<string, any>;
+  } | null;  metadata?: Record<string, any>;
 }
 
 const statusConfig: Record<string, { label: string; className: string; icon: React.ReactNode }> = {
@@ -146,7 +143,9 @@ export const AdminTransactions: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <h1 className="font-serif text-3xl font-extrabold text-white">Transactions Mobile Money</h1>
-          <p className="text-xs text-slate-400 mt-1">Vérifiez les paiements reçus puis validez ou rejetez les votes.</p>
+          <p className="text-xs text-slate-400 mt-1">
+            Confrontez chaque ligne aux SMS de l'opérateur (numéro, montant, date), puis validez ou rejetez le vote.
+          </p>
         </div>
         <button
           type="button"
@@ -213,7 +212,6 @@ export const AdminTransactions: React.FC = () => {
           <table className="min-w-full text-left text-xs">
             <thead>
               <tr className="border-b border-slate-800 text-slate-400 uppercase tracking-wider">
-                <th className="py-3 pr-4">Référence</th>
                 <th className="py-3 pr-4">Utilisateur</th>
                 <th className="py-3 pr-4">Paiement</th>
                 <th className="py-3 pr-4">Vote</th>
@@ -226,26 +224,21 @@ export const AdminTransactions: React.FC = () => {
               {filteredTransactions.length > 0 ? (
                 filteredTransactions.map((tx) => {
                   const status = statusConfig[tx.status] || statusConfig.PENDING;
-                  const declaredId = tx.metadata?.declaredTransactionId;
                   const payerPhone = tx.metadata?.payerPhone;
                   const rejectionReason = tx.metadata?.rejectionReason;
 
                   return (
                     <tr key={tx._id} className={`border-b border-slate-800/80 text-slate-200 ${tx.status === 'PENDING' ? 'bg-amber-500/[0.03]' : ''}`}>
                       <td className="py-4 pr-4">
-                        <div className="font-mono text-[11px] text-gold-300">{tx.reference}</div>
-                        {declaredId && (
-                          <div className="mt-1 font-mono text-[10px] text-emerald-300">ID: {declaredId}</div>
+                        <div className="font-semibold text-white">{tx.user?.fullName || 'Utilisateur inconnu'}</div>
+                        <div className="text-[10px] font-mono text-gold-200">{tx.user?.phone || 'Téléphone inconnu'}</div>
+                        {payerPhone && payerPhone !== tx.user?.phone && (
+                          <div className="text-[10px] text-slate-400">Payeur : {payerPhone}</div>
                         )}
                       </td>
                       <td className="py-4 pr-4">
-                        <div className="font-semibold text-white">{tx.user?.fullName || 'Utilisateur inconnu'}</div>
-                        <div className="text-[10px] text-slate-400">{tx.user?.phone || '—'}</div>
-                        {payerPhone && <div className="text-[10px] text-slate-400">Payeur : {payerPhone}</div>}
-                      </td>
-                      <td className="py-4 pr-4">
                         <div className="font-semibold text-white">{tx.amount} {tx.currency}</div>
-                        <div className="text-[10px] text-slate-400">{tx.provider} • {tx.phone}</div>
+                        <div className="text-[10px] text-slate-400">{tx.provider} • reçu au {tx.phone}</div>
                       </td>
                       <td className="py-4 pr-4">
                         <div className="font-semibold text-white">{tx.vote?.nomineeName || '—'}</div>
@@ -296,7 +289,7 @@ export const AdminTransactions: React.FC = () => {
                 })
               ) : (
                 <tr>
-                  <td colSpan={7} className="py-8 text-center text-slate-400">
+                  <td colSpan={6} className="py-8 text-center text-slate-400">
                     Aucune transaction ne correspond au filtre sélectionné.
                   </td>
                 </tr>
