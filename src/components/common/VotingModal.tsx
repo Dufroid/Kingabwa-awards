@@ -29,16 +29,14 @@ interface PaymentMethods {
   merchantName: string;
   currency: string;
   pricePerVoice: number;
-  firstPurchaseVoices: number;
+  minVoicesPerPayment: number;
   maxVoicesPerPayment: number;
   providers: PaymentProviderInfo[];
 }
 
 interface PaidVoteContext {
-  firstPurchase: boolean;
   minIncrements: number;
   maxIncrements: number;
-  lockedIncrements: number | null;
   pricePerIncrement: number;
   currency: string;
   hasPendingPayment: boolean;
@@ -75,7 +73,7 @@ export const VotingModal: React.FC<VotingModalProps> = ({
   const [successMessage, setSuccessMessage] = useState('');
   const [voteType, setVoteType] = useState<'FREE' | 'PAID'>('FREE');
   const [provider, setProvider] = useState<PaidProvider>('MPESA');
-  const [increments, setIncrements] = useState(10);
+  const [increments, setIncrements] = useState(1);
   const [methods, setMethods] = useState<PaymentMethods | null>(null);
   const [context, setContext] = useState<PaidVoteContext | null>(null);
   const [contextLoading, setContextLoading] = useState(false);
@@ -137,7 +135,7 @@ export const VotingModal: React.FC<VotingModalProps> = ({
         if (!active || !res.data.success) return;
         const data: PaidVoteContext = res.data.data;
         setContext(data);
-        setIncrements(data.lockedIncrements ?? data.minIncrements ?? 1);
+        setIncrements(data.minIncrements ?? 1);
       })
       .catch(() => {
         if (active) setContext(null);
@@ -157,9 +155,9 @@ export const VotingModal: React.FC<VotingModalProps> = ({
   const merchantPhone = selectedProviderInfo?.phone || '';
   const pricePerVoice = context?.pricePerIncrement ?? methods?.pricePerVoice ?? 500;
   const totalPrice = increments * pricePerVoice;
-  const isFirstPurchase = context?.firstPurchase ?? true;
-  const lockedIncrements = context?.lockedIncrements ?? null;
   const hasPendingPayment = Boolean(context?.hasPendingPayment);
+  const minV = context?.minIncrements ?? 1;
+  const maxV = context?.maxIncrements ?? 300;
 
   const copyValue = async (value: string, field: 'phone') => {
     try {
@@ -237,7 +235,7 @@ export const VotingModal: React.FC<VotingModalProps> = ({
     setPaymentState(null);
     setVoteType('FREE');
     setProvider('MPESA');
-    setIncrements(10);
+    setIncrements(1);
     setContext(null);
     setCopiedField(null);
     onClose();
@@ -391,9 +389,8 @@ export const VotingModal: React.FC<VotingModalProps> = ({
                   ) : (
                     <>
                       <div className="rounded-2xl border border-amber-500/30 bg-amber-500/10 p-3 text-[11px] leading-relaxed text-amber-100">
-                        {isFirstPurchase
-                          ? `Première transaction obligatoire : ${lockedIncrements ?? 10} voix pour ${(lockedIncrements ?? 10) * pricePerVoice} FC. Ensuite, vous pourrez acheter de 1 à ${context?.maxIncrements ?? 10} voix par paiement.`
-                          : `Vous pouvez acheter de 1 à ${context?.maxIncrements ?? 10} voix, à ${pricePerVoice} FC par voix.`}
+                        Choisissez entre {minV} et {maxV} voix par paiement. 500 FC par voix.
+                        Vous pouvez voter plusieurs fois, à condition que votre transaction précédente ait été validée par l'administrateur.
                       </div>
 
                       <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider">
@@ -452,31 +449,40 @@ export const VotingModal: React.FC<VotingModalProps> = ({
                       </div>
 
                       <div className="rounded-2xl border border-slate-800 bg-dark-900 p-3 space-y-3">
-                        {lockedIncrements ? (
-                          <div className="flex items-center justify-between text-[11px] text-slate-300">
-                            <span className="uppercase tracking-wider text-slate-400">Nombre de voix</span>
-                            <span className="font-bold text-gold-300">{lockedIncrements} voix = {lockedIncrements * pricePerVoice} FC</span>
-                          </div>
-                        ) : (
-                          <>
-                            <div className="flex items-center justify-between text-[10px] uppercase tracking-wider text-slate-400">
-                              <span>Nombre de voix</span>
-                              <span className="font-bold text-gold-300">{increments} × {pricePerVoice} FC = {totalPrice} FC</span>
-                            </div>
-                            <input
-                              type="range"
-                              min={context?.minIncrements ?? 1}
-                              max={context?.maxIncrements ?? 10}
-                              value={increments}
-                              onChange={(e) => setIncrements(Number(e.target.value))}
-                              className="w-full accent-gold-400 h-2"
-                            />
-                            <div className="flex justify-between text-[10px] text-slate-400">
-                              <span>{context?.minIncrements ?? 1}</span>
-                              <span>{context?.maxIncrements ?? 10}</span>
-                            </div>
-                          </>
-                        )}
+                        <div className="flex items-center justify-between text-[10px] uppercase tracking-wider text-slate-400">
+                          <span>Nombre de voix</span>
+                          <span className="font-bold text-gold-300">{increments} × {pricePerVoice} FC = <span className="text-lg text-gold-400">{totalPrice.toLocaleString()} FC</span></span>
+                        </div>
+                        <input
+                          type="range"
+                          min={minV}
+                          max={maxV}
+                          step={1}
+                          value={increments}
+                          onChange={(e) => setIncrements(Number(e.target.value))}
+                          className="w-full accent-gold-400 h-2"
+                        />
+                        <div className="flex justify-between text-[10px] text-slate-400">
+                          <span>{minV} voix</span>
+                          <span className="text-gold-400 font-bold">{increments} voix sélectionnées</span>
+                          <span>{maxV} voix</span>
+                        </div>
+                        <div className="grid grid-cols-4 gap-1 mt-1">
+                          {[10, 50, 100, 300].map((preset) => (
+                            <button
+                              key={preset}
+                              type="button"
+                              onClick={() => setIncrements(Math.min(preset, maxV))}
+                              className={`rounded-lg py-1 text-[10px] font-bold border transition-colors ${
+                                increments === preset
+                                  ? 'border-gold-400 bg-gold-400/20 text-gold-300'
+                                  : 'border-slate-700 text-slate-400 hover:border-slate-500'
+                              }`}
+                            >
+                              {preset}
+                            </button>
+                          ))}
+                        </div>
                       </div>
                     </>
                   )}

@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Wallet, CheckCircle2, Clock3, AlertCircle, Check, X, RefreshCw } from 'lucide-react';
+import { Wallet, CheckCircle2, Clock3, AlertCircle, Check, X, RefreshCw, FileDown } from 'lucide-react';
 import api from '../../services/api.js';
 import { useToast } from '../../context/ToastContext.js';
 
@@ -59,6 +59,7 @@ export const AdminTransactions: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [actionId, setActionId] = useState<string | null>(null);
+  const [pdfLoading, setPdfLoading] = useState(false);
   const [statusFilter, setStatusFilter] = useState<'ALL' | 'PENDING' | 'PAID' | 'FAILED' | 'CANCELLED'>('ALL');
   const { showToast } = useToast();
 
@@ -81,6 +82,26 @@ export const AdminTransactions: React.FC = () => {
   useEffect(() => {
     fetchTransactions();
   }, []);
+
+  const handleDownloadPdf = async () => {
+    setPdfLoading(true);
+    try {
+      const res = await api.get('/admin/reports/transactions-pdf', { responseType: 'blob' });
+      const url = window.URL.createObjectURL(new Blob([res.data], { type: 'application/pdf' }));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `kingabwa-transactions-${new Date().toISOString().slice(0, 10)}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+      showToast('PDF téléchargé avec succès.', 'success');
+    } catch (err: any) {
+      showToast(err.response?.data?.message || 'Erreur lors de la génération du PDF.', 'error');
+    } finally {
+      setPdfLoading(false);
+    }
+  };
 
   const handleValidate = async (transaction: TransactionItem) => {
     setActionId(transaction._id);
@@ -147,15 +168,26 @@ export const AdminTransactions: React.FC = () => {
             Confrontez chaque ligne aux SMS de l'opérateur (numéro, montant, date), puis validez ou rejetez le vote.
           </p>
         </div>
-        <button
-          type="button"
-          onClick={() => fetchTransactions(true)}
-          disabled={refreshing}
-          className="inline-flex items-center gap-2 self-start rounded-xl border border-slate-700 px-3 py-2 text-xs font-semibold text-slate-200 hover:border-gold-400 disabled:opacity-50"
-        >
-          <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
-          Actualiser
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={handleDownloadPdf}
+            disabled={pdfLoading}
+            className="inline-flex items-center gap-2 self-start rounded-xl border border-gold-400/50 bg-gold-400/10 px-3 py-2 text-xs font-semibold text-gold-300 hover:bg-gold-400/20 disabled:opacity-50 transition-colors"
+          >
+            <FileDown className={`w-4 h-4 ${pdfLoading ? 'animate-bounce' : ''}`} />
+            {pdfLoading ? 'Génération...' : 'Télécharger PDF'}
+          </button>
+          <button
+            type="button"
+            onClick={() => fetchTransactions(true)}
+            disabled={refreshing}
+            className="inline-flex items-center gap-2 self-start rounded-xl border border-slate-700 px-3 py-2 text-xs font-semibold text-slate-200 hover:border-gold-400 disabled:opacity-50"
+          >
+            <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
+            Actualiser
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
